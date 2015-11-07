@@ -1,7 +1,7 @@
 # PriceYourHorse: Timeline
 ### Due Monday, Nov 9
 -  [x] Initialize Github repo
--  [ ] Update data collection
+-  [x] Update data collection
 -  [ ] Implement feature extraction module
 -  [ ] Run feature extraction into new mongodb table
 -  [ ] Implement preprocessor class (basic version)
