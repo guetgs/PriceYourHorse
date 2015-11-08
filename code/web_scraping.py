@@ -239,6 +239,15 @@ def scrap_many(linklist, table, start_link):
 
 
 def run_from_scratch(url, table):
+    '''
+    INPUT: string, mongodb table
+    OUTPUT: None
+
+    Calls different functions to scrape links to detail pages
+    from url, scrape these detail pages and store
+    extracted features in the mongodb table provided as input
+    parameter.
+    '''
     start_page = 0
     delta_page = 100
     max_page = save_linklists(url, start_page, delta_page)
@@ -247,6 +256,14 @@ def run_from_scratch(url, table):
 
 
 def continue_at_custom_link(url, table, current_link):
+    '''
+    INPUT: string, mongodb table, int
+    OUTPUT: None
+
+    Continues scraping detail pages starting from the link
+    indexed by current_link and stores extracted features
+    in table.
+    '''
     max_page = 10154
     linklist = load_linklists(start_page, delta_page, max_page)
     print linklist[current_link]
