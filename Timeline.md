@@ -3,13 +3,13 @@
 -  [x] Initialize Github repo
 -  [x] Update data collection
 -  [x] Implement feature extraction module
--  [ ] Run feature extraction into new mongodb table
--  [ ] Implement preprocessor class (basic version)
+-  [x] Run feature extraction into new mongodb table
+-  [x] Implement preprocessor class (basic version)
 	- [x] Implement data cleanup method
-	- [ ] Implement feature engineering method
-	- [ ] Implement filling missing values method
-	- [ ] Implement feature selection method
-	- [ ] Outline tranform only method to be used to prepare user input data
+	- [x] Implement feature engineering method
+	- [x] Implement filling missing values method
+	- [x] Implement feature selection method
+	- [x] Outline tranform only method to be used to prepare user input data
 
 ### Due Tuesday, Nov 10
 - [ ] Implement model class (basic version)
