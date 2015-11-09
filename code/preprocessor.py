@@ -182,8 +182,11 @@ class BasicPreprocessor(object):
         Determines horse age from foal date.
         '''
         age = datetime.date.today().year - foal_date.year
+        mode_foal_date = self.most_common_values['Foal Date']
+        mode_foal_date = pd.to_datetime(mode_foal_date)
+        mode_age = datetime.date.today().year - mode_foal_date.year
         if (age < 0) or (age > 40):
-            age = None
+            age = mode_age
         return age
 
     def dummify(self, columns):
@@ -207,7 +210,7 @@ class BasicPreprocessor(object):
         columns = list(self.df.columns.values)
         rm = [u'Foal Date', u'In Foal', u'Markings', u'Name', u'State Bred',
               u'City', u'State', u'Ad Created', u'Last Update', u'Description',
-              u'_id', u'Registry Number', u'Registry', u'Ad Number']
+              u'Registry Number', u'Registry', u'Ad Number']
         for column in rm:
             columns.remove(column)
         self.final_columns = columns
