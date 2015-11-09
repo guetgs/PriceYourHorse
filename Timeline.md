@@ -12,11 +12,11 @@
 	- [x] Outline tranform only method to be used to prepare user input data
 
 ### Due Tuesday, Nov 10
-- [ ] Implement model class (basic version)
-	- [ ] Implement fit-transform method
-	- [ ] Implement predict method
-	- [ ] Implement score method
-	- [ ] Implement crossvalidation method
+- [x] Implement model class (basic version)
+	- [x] Implement fit-transform method
+	- [x] Implement predict method
+	- [x] Implement score method
+	- [x] Implement crossvalidation method
 
 ### Due Wednesday, Nov 11
 - [ ] Implement web application (basic version)
