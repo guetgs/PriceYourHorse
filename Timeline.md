@@ -2,10 +2,10 @@
 ### Due Monday, Nov 9
 -  [x] Initialize Github repo
 -  [x] Update data collection
--  [ ] Implement feature extraction module
+-  [x] Implement feature extraction module
 -  [ ] Run feature extraction into new mongodb table
 -  [ ] Implement preprocessor class (basic version)
-	- [ ] Implement data cleanup method
+	- [x] Implement data cleanup method
 	- [ ] Implement feature engineering method
 	- [ ] Implement filling missing values method
 	- [ ] Implement feature selection method
