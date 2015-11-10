@@ -21,7 +21,7 @@
 ### Due Wednesday, Nov 11
 - [ ] Implement web application (basic version)
 	- [x] Select bootstrap template
-	- [ ] Implement skeleton for all views
+	- [x] Implement skeleton for all views
 	- [ ] Implement user input form view
 	- [ ] Implement prediction view
 
