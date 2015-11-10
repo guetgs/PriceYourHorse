@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="inner cover">
+  <h1 class="cover-heading">PriceYourHorse</h1>
+  <p class="lead">Determine The Price Tag</p>
+  <br><br>
+  <h2>The predicted price for your horse is</h2>
+  <br>
+  <h2>${{price}}<h2>
+</div>
+
+<div class="col-lg-5">
+  <p class="bs-component">
+    <a href="submit/" class="btn btn-default btn-lg btn-block">Back To Predictor</a>
+  </p>
+</div>
+{% endblock %}
