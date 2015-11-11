@@ -1,7 +1,41 @@
 import numpy as np
 import pandas as pd
 import datetime
+from feature_dict import Color_dict, Breeds_dict
 from collections import Counter
+
+SKILLS = ['Incentive Fund', 'Register Of Merit', 'Companion',\
+          'English Pleasure', 'Color Producer', 'Import', 'Homozygous Grey',\
+          'Show Experience', 'Endurance', 'All Around', 'Parade',\
+          'Racehorse', 'Finished', 'Field Hunter', 'Trick', 'Equitation',\
+          'Driving', 'Started Under Saddle', 'Dressage', 'Show Winner',\
+          'Trail', 'Athletic', 'Longe Line', 'Reining', 'Project',\
+          'Trail Riding', 'Racing', 'Show Hack', 'Breeding', 'Pony Club']
+
+BREEDS = ['Akhal Teke', 'Andalusian', 'Appaloosa', 'Arabian', 'Barb',\
+          'Bashkir Curly', 'Belgian', 'Canadian', 'Chincoteague Pony',\
+          'Connemara Pony', 'Crossbred Pony', 'Dales Pony', 'Dartmoor Pony',\
+          'Donkey', 'Dutch', 'Exmoor Pony', 'Fjord', 'Highland Pony',\
+          'Florida Cracker', 'Friesian', 'Gotland Pony', 'Hackney',\
+          'Haflinger', 'Half Arabian', 'Hanoverian', 'Heavy Horse',\
+          'Holsteiner', 'Hungarian', 'Iberian', 'Icelandic', 'Irish Draught',\
+          'Knabstrupper', 'Lipizzan', 'Marchador', 'Miniature',\
+          'Missouri Fox Trotter', 'Morab', 'Morgan', 'Mule', 'Mustang',\
+          'New Forest Pony', 'Newfoundland Pony', 'Nokota', 'Oldenburg',\
+          'Paint', 'Paint Pony', 'Palomino', 'Paso Fino', 'Pinto',\
+          'Pony', 'Quarter Horse', 'Saddlebred', 'Shetland Pony', 'Shire',\
+          'Standardbred', 'Tennessee Walking', 'Thoroughbred', 'Tiger',\
+          'Trakehner', 'Walkaloosa', 'Warmblood', 'Welsh Cob', 'Welsh Pony',\
+          'Westphalian', 'Other']
+
+COLORS = ['Bay', 'Black', 'Brindle', 'Brown', 'Buckskin', 'Champagne',\
+          'Chestnut', 'Chocolate', 'Cremello', 'Dun', 'Grey', 'Grulla',\
+          'Liver Chestnut', 'Other', 'Overo', 'Palomino', 'Perlino',\
+          'Piebald', 'Pinto', 'Roan', 'Sabino', 'Sil', 'Sorrel', 'Tobiano',\
+          'Tovero', 'White']
+
+SEXES = ['Broodmare', 'Colt', 'Filly', 'Foal', 'Gelding', 'Mare', 'Ridgling',\
+         'Stallion', 'Unborn Foal', 'Weanling', 'Yearling']
 
 
 class BasicPreprocessor(object):
@@ -26,56 +60,38 @@ class BasicPreprocessor(object):
         to fit a model.
         '''
         self.df = df.copy()
-        self.clean_up()
+        self.df = self.clean_up(self.df)
+        print 'data cleaned...'
         self.fit_most_common_values()
         self.fillna()
+        print 'na filled...'
         self.engineer_features()
         return self.select_features()
 
-    def clean_up(self):
+    def transform(self, feature_dict):
         '''
-        INPUT: None
-        OUTPUT: None
+        INPUT: dictionary
+        OUTPUT: 2D numpy array
 
-        Cleans data in internal dataframe into consistent
-        format and datatype.
+        Transforms input dataframe to meet the format required to serve as
+        input data into a model.
         '''
-        df = self.df
-        df.drop_duplicates(['Breed', 'Color', 'Foal Date', 'Height (hh)',
-                            'In Foal', 'Markings', 'Name', 'Sex',
-                            'State Bred', 'Temperament', 'Weight (lbs)',
-                            'City', 'Pedigree', 'Price', 'State'],
-                            inplace=True)
-        
-        # Create Dummy Variables for all Skills/Disciplines
-        # present in the data set.
-        df['Skills / Disciplines'] = df['Skills / Disciplines'].fillna(u'-')
-        df['Skills / Disciplines'] = df['Skills / Disciplines']\
-                                     .apply(lambda y: [] if y == u'-'
-                                            else y.split(', '))
-        skills = Counter([x for y in df['Skills / Disciplines'] for x in y])
-        for skill, val in skills.iteritems():
-            if val > 10:
-                df[skill] = df['Skills / Disciplines'].apply(lambda x: 1\
-                                                             if skill in x\
-                                                             else 0)
-        df.drop('Skills / Disciplines', axis=1, inplace=True)
-        # Replace missing values '-' by None
-        df = df.apply(lambda x: x.apply(lambda y: None if y == u'-' else y))
-        
-        # Apply individual clean up functions to columns
-        df['Price'] = df['Price'].apply(self.clean_price)
-        df['Ad Created'] = df['Ad Created'].apply(self.clean_date)
-        df['Foal Date'] = df['Foal Date'].apply(self.clean_date)
-        df['Last Update'] = df['Last Update'].apply(self.clean_date)
-        df['Height (hh)'] = df['Height (hh)'].apply(self.clean_height)
-        df['Temperament'] = df['Temperament'].apply(lambda x: eval(x + '.')\
-                                                    if isinstance(x, unicode)\
-                                                     else None)
-        df['Weight (lbs)'] = df['Weight (lbs)'].astype('float')\
-                                               .apply(lambda x: None\
-                                                      if x > 3000 else abs(x))
-        self.df = df
+        df = pd.Series(feature_dict).to_frame().transpose()
+        df = self.clean_up(df, fit=False)
+        cols = self.final_columns
+        cols.remove(u'_id')
+        return df[cols].values
+
+
+    def clean_prices(self, series):
+        '''
+        INPUT: pandas series
+        OUTPUT: 1D numpy array
+
+        Cleans target variable "Price" independent of other features.
+        '''
+        series = series.apply(self.clean_price)
+        return series.values
 
     def clean_price(self, s):
         '''
@@ -93,6 +109,58 @@ class BasicPreprocessor(object):
                 x = s.replace(',', '').split(' ')[0]
                 return float(x[1:])
         return None
+
+
+    def clean_up(self, df, fit=True):
+        '''
+        INPUT: dataframe, boolean
+        OUTPUT: dataframe
+
+        Cleans data into consistent format and datatypes.
+        '''
+        # Create Dummy Variables
+        df['Skills / Disciplines'] = df['Skills / Disciplines'].fillna(u'-')
+        df['Skills / Disciplines'] = df['Skills / Disciplines']\
+                                     .apply(lambda y: [] if y == u'-'
+                                            else y.split(', '))
+        # skills = Counter([x for y in df['Skills / Disciplines'] for x in y])
+        for skill in SKILLS:
+            df['Skill_' + skill] = df['Skills / Disciplines']\
+                                   .apply(lambda x: 1\
+                                    if unicode(skill) in x else 0)
+        df.drop('Skills / Disciplines', axis=1, inplace=True)
+        for breed in BREEDS:
+            df['Breed_' + breed] = df['Breed']\
+                                   .apply(lambda x: 1\
+                                          if Breeds_dict[x] == breed else 0)
+        df.drop('Breed', axis=1, inplace=True)
+        for color in COLORS:
+            df['Color_' + color] = df['Color']\
+                                   .apply(lambda x: 1\
+                                          if Color_dict[x] == color else 0)
+        df.drop('Color', axis=1, inplace=True)
+        for sex in SEXES:
+            df['Sex_' + sex] = df['Sex'].apply(lambda x: 1\
+                                               if x == unicode(sex) else 0)
+        df.drop('Sex', axis=1, inplace=True)
+        # Replace missing values '-' by None
+        df = df.apply(lambda x: x.apply(lambda y: None if y == u'-' else y))
+        
+        # Apply individual clean up functions to columns
+        df['Height (hh)'] = df['Height (hh)'].apply(self.clean_height)
+        df['Temperament'] = df['Temperament'].apply(lambda x: eval(x + '.')\
+                                                    if isinstance(x, unicode)\
+                                                     else None)
+        df['Weight (lbs)'] = df['Weight (lbs)'].astype('float')\
+                                               .apply(lambda x: None\
+                                                      if x > 3000 else abs(x))
+        if fit:
+            df['Ad Created'] = df['Ad Created'].apply(self.clean_date)
+            df['Foal Date'] = df['Foal Date'].apply(self.clean_date)
+            df['Last Update'] = df['Last Update'].apply(self.clean_date)
+        else:
+            df['Age'] = df['Age'].apply(lambda x: float(x))    
+        return df
     
     def clean_date(self, s):
         '''
@@ -138,8 +206,7 @@ class BasicPreprocessor(object):
         INPUT: None
         OUPUT: None
 
-        Determines and stores most common value for all columns except Price,
-        since Price is the prediction target.
+        Determines and stores most common value for all columns.
         '''
         self.most_common_values = {}
         for column in self.df.columns:
@@ -157,7 +224,6 @@ class BasicPreprocessor(object):
         Fills missing values with most common value for each column.
         '''
         columns = list(self.df.columns.values)
-        columns.remove(u'Price')
         for column in columns:
             value = self.most_common_values[column]
             self.df[column].fillna(value, inplace=True)
@@ -171,7 +237,6 @@ class BasicPreprocessor(object):
         Engineers new features and dummifies selected categorical features.
         '''
         self.df['Age'] = self.df['Foal Date'].apply(self.add_age)
-        self.dummify(['Breed', 'Color', 'Sex'])
         
 
     def add_age(self, foal_date):
@@ -189,17 +254,6 @@ class BasicPreprocessor(object):
             age = mode_age
         return age
 
-    def dummify(self, columns):
-        '''
-        INPUT: list of strings
-        OUTPUT: None
-
-        Creates dummy variables for all categories present the columns
-        defined by the input parameter.
-        '''
-        self.df = pd.get_dummies(self.df, columns=columns)
-
-
     def select_features(self):
         '''
         INPUT: None
@@ -216,13 +270,5 @@ class BasicPreprocessor(object):
         self.final_columns = columns
         return self.df[self.final_columns]
 
-    def transform(self, df):
-        '''
-        INPUT: dataframe
-        OUTPUT: dataframe
-
-        Transforms input dataframe to meet the format required to serve as
-        input data into a model.
-        '''
 
 

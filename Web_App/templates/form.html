@@ -4,31 +4,91 @@
   <h1 class="cover-heading">PriceYourHorse</h1>
   <p class="lead">Determine The Price Tag</p>
   <br><br>
+  <div class="row">
+          <div class="col-lg-6">
+            <div class="well bs-component">
     <form class="form-horizontal" action='/predictor' method='POST'>
         <fieldset>
           <h2>Please select the characteristics of your horse</h2>
           <div class="form-group">
-            <label for="sex" class="col-lg-2 control-label">Sex</label>
+            <label for="select" class="col-lg-2 control-label">Sex</label>
             <div class="col-lg-10">
-              <select class="form-control" id="select">
-                <option>Mare</option>
-                <option>Gelding</option>
-                <option>Stallion</option>
-                <option>Filly</option>
+              <select class="form-control" id="select" name="Sex">
+                {% for sex in sexes %}
+                <option>{{sex}}</option>
+                {% endfor %}
               </select>
             </div>
           </div>
           <div class="form-group">
             <label for="breed" class="col-lg-2 control-label">Breed</label>
             <div class="col-lg-10">
-              <select class="form-control" id="select">
-                <option>Lipizzan</option>
-                <option>Mule</option>
-                <option>Arabian</option>
-                <option>Welsh Pony</option>
+              <select class="form-control" id="select" name="Breed">
+                {% for breed in breeds %}
+                <option>{{breed}}</option>
+                {% endfor %}
               </select>
             </div>
           </div>
+          <div class="form-group">
+            <label for="color" class="col-lg-2 control-label">Color</label>
+            <div class="col-lg-10">
+              <select class="form-control" id="select" name="Color">
+                {% for color in colors %}
+                <option>{{color}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="temperament" class="col-lg-2 control-label">Temperament</label>
+            <div class="col-lg-10">
+              <select class="form-control" id="select" name="Temperament">
+                {% for t in temperaments %}
+                <option>{{t}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="pedigree" class="col-lg-2 control-label">Pedigree</label>
+            <div class="col-lg-10">
+              <select class="form-control" id="select" name="Pedigree">
+                <option>no</option>
+                <option>yes</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="height" class="col-lg-2 control-label">Height (hh)</label>
+            <div class="col-lg-10">
+              <input type="text" class="form-control" id="height" placeholder="Height", name="Height (hh)">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="age" class="col-lg-2 control-label">Age (yrs)</label>
+            <div class="col-lg-10">
+              <input type="text" class="form-control" id="age" placeholder="Age", name="Age">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="weight" class="col-lg-2 control-label">Weight (lbs)</label>
+            <div class="col-lg-10">
+              <input type="text" class="form-control" id="weight" placeholder="Weight", name="Weight (lbs)">
+            </div>
+          </div>
+          <div class="form-group">
+                    <label for="skills" class="col-lg-2 control-label">Skills</label>
+                    <div class="col-lg-10">
+                      <div class="checkbox">
+                        {% for skill in skills %}
+                        <label>
+                          <input type="checkbox", name="{{skill}}"> {{skill}}
+                        </label>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </div>
           <div class="form-group">
             <div class="col-lg-10 col-lg-offset-2">
               <button type="reset" class="btn btn-default">Cancel</button>
@@ -37,5 +97,6 @@
           </div>
         </fieldset>
     </form>
+    </div>
 </div>
 {% endblock %}
