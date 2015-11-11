@@ -145,8 +145,8 @@ class BasicPreprocessor(object):
         Transforms temperament from string to float and categorizes it
         into high (1) and low (0) variance classes, based on EDA.
         '''
-        if isinstance(h, unicode):
-            t = eval(x + '.')
+        if isinstance(s, unicode):
+            t = eval(s + '.')
             if t >= 0.8:
                 return 0
             if t < 0.1:

@@ -12,7 +12,8 @@ TABLE_NAME = 'horse_features_all'
 
 MODEL_PARAMS = {'n_estimators': 100,
                 'max_features': 'auto',
-                'oob_score': True}
+                'oob_score': True,
+                'n_jobs': -1}
 
 def load_all(table):
     df = pd.DataFrame([x for x in table.find()])
