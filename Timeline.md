@@ -19,14 +19,14 @@
 	- [x] Implement crossvalidation method
 
 ### Due Wednesday, Nov 11
-- [ ] Implement web application (basic version)
+- [x] Implement web application (basic version)
 	- [x] Select bootstrap template
 	- [x] Implement skeleton for all views
-	- [ ] Implement user input form view
-	- [ ] Implement prediction view
+	- [x] Implement user input form view
+	- [x] Implement prediction view
 
 ### Due Thursday, Nov 12
-- [ ] Implement preprocessor transform method to process user input data
+- [x] Implement preprocessor transform method to process user input data
 - [ ] Update preprocessor class to process text descriptions
 	- [ ] Update cleanup method
 	- [ ] Implement text vectorizer method
