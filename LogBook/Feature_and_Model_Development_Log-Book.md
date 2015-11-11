@@ -57,7 +57,7 @@ Weight: Discard Weight
 ### Third Model
 #####Features:
 - Skills / Disciplines Dummy Variables (limited Skill set)
-- Height (hh) as float (outlier removed, inches converted to hh
+- Height (hh) as float (outlier removed, inches converted to hh)
 - Temperament as dummy (extreme vs intermediate values)
 - Age as float (derived from Foal Date)
 - Breed as Dummy Variables (remove selected breeds)
