@@ -8,6 +8,18 @@ a:focus,
 a:hover {
   color: #fff;
 }
+/* Custom changes */
+.well {
+  background-color: #63A500;
+}
+.btn-primary {
+  background-color: #395F00;
+}
+.btn-primary:hover {
+  background-color: #9BFF04;
+  color: #395F00;
+}
+
 
 /* Custom default button */
 .btn-default,

@@ -1,7 +1,10 @@
 import flask
 import pickle
+import sys
 import pandas as pd
 from feature_lists import Skills, Temperaments, Breeds, Colors, Sexes
+
+sys.path.append('../code/')
 
 app = flask.Flask(__name__)
 
@@ -34,7 +37,7 @@ def prediction():
         columns = ['Height (hh)', 'Weight (lbs)', 'Age', 'Temperament',\
                    'Sex', 'Breed', 'Color']
         data = {}
-        data['_id'] = 1
+        data[u'_id'] = 1
         data['Pedigree'] = 1 if form['Pedigree'] == 'yes' else 0
         for col in columns:
             data[col] = form[col]

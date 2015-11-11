@@ -26,7 +26,7 @@ def identify_y_outlier_borders(y):
 
 
 def get_X_y(df):
-    upper_border = identify_y_outlier_borders(df.Price.values)
+    upper_border = 60000
     complete_df = df[(df['Price'] > 0) & (df['Price'] < upper_border)]
     y = complete_df.Price.values
     complete_df = complete_df.drop(['Price', '_id'], axis=1)

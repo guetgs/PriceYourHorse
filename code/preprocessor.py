@@ -1,41 +1,17 @@
 import numpy as np
 import pandas as pd
 import datetime
-from feature_dict import Color_dict, Breeds_dict
+from feature_dict import Color_dict, Breeds_dict, Sex_dict
+from feature_lists import Breeds, Skills, Colors, Sexes
 from collections import Counter
 
-SKILLS = ['Incentive Fund', 'Register Of Merit', 'Companion',\
-          'English Pleasure', 'Color Producer', 'Import', 'Homozygous Grey',\
-          'Show Experience', 'Endurance', 'All Around', 'Parade',\
-          'Racehorse', 'Finished', 'Field Hunter', 'Trick', 'Equitation',\
-          'Driving', 'Started Under Saddle', 'Dressage', 'Show Winner',\
-          'Trail', 'Athletic', 'Longe Line', 'Reining', 'Project',\
-          'Trail Riding', 'Racing', 'Show Hack', 'Breeding', 'Pony Club']
+SKILLS = Skills
 
-BREEDS = ['Akhal Teke', 'Andalusian', 'Appaloosa', 'Arabian', 'Barb',\
-          'Bashkir Curly', 'Belgian', 'Canadian', 'Chincoteague Pony',\
-          'Connemara Pony', 'Crossbred Pony', 'Dales Pony', 'Dartmoor Pony',\
-          'Donkey', 'Dutch', 'Exmoor Pony', 'Fjord', 'Highland Pony',\
-          'Florida Cracker', 'Friesian', 'Gotland Pony', 'Hackney',\
-          'Haflinger', 'Half Arabian', 'Hanoverian', 'Heavy Horse',\
-          'Holsteiner', 'Hungarian', 'Iberian', 'Icelandic', 'Irish Draught',\
-          'Knabstrupper', 'Lipizzan', 'Marchador', 'Miniature',\
-          'Missouri Fox Trotter', 'Morab', 'Morgan', 'Mule', 'Mustang',\
-          'New Forest Pony', 'Newfoundland Pony', 'Nokota', 'Oldenburg',\
-          'Paint', 'Paint Pony', 'Palomino', 'Paso Fino', 'Pinto',\
-          'Pony', 'Quarter Horse', 'Saddlebred', 'Shetland Pony', 'Shire',\
-          'Standardbred', 'Tennessee Walking', 'Thoroughbred', 'Tiger',\
-          'Trakehner', 'Walkaloosa', 'Warmblood', 'Welsh Cob', 'Welsh Pony',\
-          'Westphalian', 'Other']
+BREEDS = Breeds
 
-COLORS = ['Bay', 'Black', 'Brindle', 'Brown', 'Buckskin', 'Champagne',\
-          'Chestnut', 'Chocolate', 'Cremello', 'Dun', 'Grey', 'Grulla',\
-          'Liver Chestnut', 'Other', 'Overo', 'Palomino', 'Perlino',\
-          'Piebald', 'Pinto', 'Roan', 'Sabino', 'Sil', 'Sorrel', 'Tobiano',\
-          'Tovero', 'White']
+COLORS = Colors
 
-SEXES = ['Broodmare', 'Colt', 'Filly', 'Foal', 'Gelding', 'Mare', 'Ridgling',\
-         'Stallion', 'Unborn Foal', 'Weanling', 'Yearling']
+SEXES = Sexes
 
 
 class BasicPreprocessor(object):
@@ -79,7 +55,8 @@ class BasicPreprocessor(object):
         df = pd.Series(feature_dict).to_frame().transpose()
         df = self.clean_up(df, fit=False)
         cols = self.final_columns
-        cols.remove(u'_id')
+        if u'_id' in cols:
+            cols.remove(u'_id')
         return df[cols].values
 
 
@@ -141,16 +118,14 @@ class BasicPreprocessor(object):
         df.drop('Color', axis=1, inplace=True)
         for sex in SEXES:
             df['Sex_' + sex] = df['Sex'].apply(lambda x: 1\
-                                               if x == unicode(sex) else 0)
+                                               if Sex_dict[x] == sex else 0)
         df.drop('Sex', axis=1, inplace=True)
         # Replace missing values '-' by None
         df = df.apply(lambda x: x.apply(lambda y: None if y == u'-' else y))
         
         # Apply individual clean up functions to columns
         df['Height (hh)'] = df['Height (hh)'].apply(self.clean_height)
-        df['Temperament'] = df['Temperament'].apply(lambda x: eval(x + '.')\
-                                                    if isinstance(x, unicode)\
-                                                     else None)
+        df['Temperament'] = df['Temperament'].apply(self.clean_temperament)
         df['Weight (lbs)'] = df['Weight (lbs)'].astype('float')\
                                                .apply(lambda x: None\
                                                       if x > 3000 else abs(x))
@@ -161,6 +136,23 @@ class BasicPreprocessor(object):
         else:
             df['Age'] = df['Age'].apply(lambda x: float(x))    
         return df
+
+    def clean_temperament(self, s):
+        '''
+        INPUT: string
+        OUTPUT: float
+
+        Transforms temperament from string to float and categorizes it
+        into high (1) and low (0) variance classes, based on EDA.
+        '''
+        if isinstance(h, unicode):
+            t = eval(x + '.')
+            if t >= 0.8:
+                return 0
+            if t < 0.1:
+                return 0
+            return 1
+        return None
     
     def clean_date(self, s):
         '''
@@ -264,7 +256,7 @@ class BasicPreprocessor(object):
         columns = list(self.df.columns.values)
         rm = [u'Foal Date', u'In Foal', u'Markings', u'Name', u'State Bred',
               u'City', u'State', u'Ad Created', u'Last Update', u'Description',
-              u'Registry Number', u'Registry', u'Ad Number']
+              u'Registry Number', u'Registry', u'Ad Number', u'Weight (lbs)']
         for column in rm:
             columns.remove(column)
         self.final_columns = columns
