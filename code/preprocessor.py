@@ -4,6 +4,8 @@ import datetime
 from feature_dict import Color_dict, Breeds_dict, Sex_dict
 from feature_lists import Breeds, Skills, Colors, Sexes
 from collections import Counter
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.decomposition import NMF
 
 SKILLS = Skills
 
@@ -95,16 +97,18 @@ class BasicPreprocessor(object):
 
         Cleans data into consistent format and datatypes.
         '''
-        # Create Dummy Variables
-        df['Skills / Disciplines'] = df['Skills / Disciplines'].fillna(u'-')
-        df['Skills / Disciplines'] = df['Skills / Disciplines']\
-                                     .apply(lambda y: [] if y == u'-'
-                                            else y.split(', '))
-        # skills = Counter([x for y in df['Skills / Disciplines'] for x in y])
-        for skill in SKILLS:
-            df['Skill_' + skill] = df['Skills / Disciplines']\
-                                   .apply(lambda x: 1\
-                                    if unicode(skill) in x else 0)
+        # merge Skills/Disciplines and Description
+        df['Description'] = df['Description'] + df['Skills / Disciplines']
+        # # Create Dummy Variables
+        # df['Skills / Disciplines'] = df['Skills / Disciplines'].fillna(u'-')
+        # df['Skills / Disciplines'] = df['Skills / Disciplines']\
+        #                              .apply(lambda y: [] if y == u'-'
+        #                                     else y.split(', '))
+        # # skills = Counter([x for y in df['Skills / Disciplines'] for x in y])
+        # for skill in SKILLS:
+        #     df['Skill_' + skill] = df['Skills / Disciplines']\
+        #                            .apply(lambda x: 1\
+        #                             if unicode(skill) in x else 0)
         df.drop('Skills / Disciplines', axis=1, inplace=True)
         for breed in BREEDS:
             df['Breed_' + breed] = df['Breed']\
@@ -226,10 +230,45 @@ class BasicPreprocessor(object):
         INPUT: None
         OUTPUT: None
 
-        Engineers new features and dummifies selected categorical features.
+        Engineers new features, performs nlp.
         '''
         self.df['Age'] = self.df['Foal Date'].apply(self.add_age)
         
+        self.df.loc[:, 'Topics'] = self.NMF_analysis()
+        self.df = pd.get_dummies(self.df, columns=['Topics'])
+
+
+        # feature_names = vec.get_feature_names()
+        # words_df = pd.DataFrame(X.todense(), columns=feature_names)
+        # self.df = pd.concat([self.df, words_df], axis=1,\
+        #                     join_axes=[self.df.index])
+
+        self.df.drop('Description', axis=1, inplace=True)
+
+
+        
+    def NMF_analysis(self):
+        descriptions = self.df['Description']
+        vec = TfidfVectorizer(strip_accents='unicode',\
+                          stop_words='english',\
+                          ngram_range=(1, 2),\
+                          min_df=100,\
+                          use_idf=False)
+        X = vec.fit_transform(descriptions)
+        features = vec.get_feature_names()
+        features = np.array(features)
+        model = NMF(12)
+        W = model.fit_transform(X)
+        H = model.components_
+        n_top_words = 10
+        self.topic_descriptons = {}
+        for topic_idx, topic in enumerate(H):
+            value = ' '.join([features[i] for i\
+                             in topic.argsort()[:-n_top_words-1:-1]])
+            self.topic_descriptons[topic_idx] = value
+        topics = [topic.argmax() for topic in W]
+        return topics
+
 
     def add_age(self, foal_date):
         '''
@@ -255,11 +294,13 @@ class BasicPreprocessor(object):
         '''
         columns = list(self.df.columns.values)
         rm = [u'Foal Date', u'In Foal', u'Markings', u'Name', u'State Bred',
-              u'City', u'State', u'Ad Created', u'Last Update', u'Description',
+              u'City', u'State', u'Ad Created', u'Last Update',
               u'Registry Number', u'Registry', u'Ad Number', u'Weight (lbs)']
         for column in rm:
+            print column
             columns.remove(column)
         self.final_columns = columns
+        print 'final columns:\n', columns
         return self.df[self.final_columns]
 
 
