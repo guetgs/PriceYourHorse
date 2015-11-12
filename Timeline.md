@@ -27,10 +27,10 @@
 
 ### Due Thursday, Nov 12
 - [x] Implement preprocessor transform method to process user input data
-- [ ] Update preprocessor class to process text descriptions
-	- [ ] Update cleanup method
-	- [ ] Implement text vectorizer method
-	- [ ] Update feature selection method
+- [x] Update preprocessor class to process text descriptions
+	- [x] Update cleanup method
+	- [x] Implement text vectorizer method
+	- [x] Update feature selection method
 	
 ### Due Friday, Nov 13
 - [ ] Update web application
