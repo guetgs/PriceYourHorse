@@ -56,6 +56,12 @@ class BasicPreprocessor(object):
         '''
         df = pd.Series(feature_dict).to_frame().transpose()
         df = self.clean_up(df, fit=False)
+        description = df['Skills / Disciplines']
+        x = self.vec.transform(description)
+        W = self.model.transform(x)
+        topic = W.argmax()
+        for t in self.topic_descriptons():
+            df['Topics_' + t] = [1 if t == topic else 0]
         cols = self.final_columns
         if u'_id' in cols:
             cols.remove(u'_id')
@@ -249,17 +255,17 @@ class BasicPreprocessor(object):
         
     def NMF_analysis(self):
         descriptions = self.df['Description']
-        vec = TfidfVectorizer(strip_accents='unicode',\
+        self.vec = TfidfVectorizer(strip_accents='unicode',\
                           stop_words='english',\
                           ngram_range=(1, 2),\
                           min_df=100,\
                           use_idf=False)
-        X = vec.fit_transform(descriptions)
-        features = vec.get_feature_names()
+        X = self.vec.fit_transform(descriptions)
+        features = self.vec.get_feature_names()
         features = np.array(features)
-        model = NMF(12)
-        W = model.fit_transform(X)
-        H = model.components_
+        self.model = NMF(12)
+        W = self.model.fit_transform(X)
+        H = self.model.components_
         n_top_words = 10
         self.topic_descriptons = {}
         for topic_idx, topic in enumerate(H):
