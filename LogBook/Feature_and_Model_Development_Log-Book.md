@@ -77,3 +77,75 @@ Parameters:
 R^2: 0.887
 OOB: 0.332
 ![Predicted vs Real Plot of all Data without outliers, first feature engineering step](figure_14_PvsV_allwo_outlier_engineeredtabularfeatures.png)
+
+### Fourth Model
+#####Features:
+- Skills / Disciplines merged with Descriptions, term-frequency matrix (strip_accents='unicode', stop_words='english', ngram_range=(1,2), min_df=100, use_idf=False)
+- Height (hh) as float (outlier removed, inches converted to hh)
+- Temperament as dummy (extreme vs intermediate values)
+- Age as float (derived from Foal Date)
+- Breed as Dummy Variables (remove selected breeds)
+- Color as Dummy Variables (reduced variable space)
+- Sex as Dummy Variables (reduced variable space)
+- Pedigree is Dummy Variable
+
+#####Model:
+Sklearn's RandomForestRegressor
+
+Parameters:
+- n_estimators: 100
+- max_features: auto
+- oob_score: True
+
+#####All Data (prices < 60000):
+R^2: 0.889
+OOB: 0.340
+![Predicted vs Real Plot of all Data without outliers, term-frequency matrix for descriptions](figure_15_PvsY_withdescription.png)
+
+### Fifth Model
+#####Features:
+- Skills / Disciplines merged with Descriptions, term-frequency matrix (strip_accents='unicode', stop_words='english', ngram_range=(1,2), min_df=100, use_idf=False), topic extraction using NMF (12 topics), topic as single numeric column
+- Height (hh) as float (outlier removed, inches converted to hh)
+- Temperament as dummy (extreme vs intermediate values)
+- Age as float (derived from Foal Date)
+- Breed as Dummy Variables (remove selected breeds)
+- Color as Dummy Variables (reduced variable space)
+- Sex as Dummy Variables (reduced variable space)
+- Pedigree is Dummy Variable
+
+#####Model:
+Sklearn's RandomForestRegressor
+
+Parameters:
+- n_estimators: 100
+- max_features: auto
+- oob_score: True
+
+#####Trained only on data with price (prices < 60000):
+R^2: 0.890
+OOB: 0.346
+![Predicted vs Real Plot of all priced Data without outliers, topic column](figure_16_PvsY_topics_from_description.png)
+
+### Sixth Model
+#####Features:
+- Skills / Disciplines merged with Descriptions, term-frequency matrix (strip_accents='unicode', stop_words='english', ngram_range=(1,2), min_df=100, use_idf=False), topic extraction using NMF (12 topics), topic dummy variables
+- Height (hh) as float (outlier removed, inches converted to hh)
+- Temperament as dummy (extreme vs intermediate values)
+- Age as float (derived from Foal Date)
+- Breed as Dummy Variables (remove selected breeds)
+- Color as Dummy Variables (reduced variable space)
+- Sex as Dummy Variables (reduced variable space)
+- Pedigree is Dummy Variable
+
+#####Model:
+Sklearn's RandomForestRegressor
+
+Parameters:
+- n_estimators: 100
+- max_features: auto
+- oob_score: True
+
+#####Trained only on data with price (prices < 60000):
+R^2: 0.889
+OOB: 0.340
+![Predicted vs Real Plot of all priced Data without outliers, topic dummies](figure_17_PvsY_topics_as_dummies.png)
