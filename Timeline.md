@@ -37,7 +37,8 @@
 	- [x] Implement description page
 	- [x] Implement author information page
 - [ ] Update preprocessor
-	- [ ] Update feature selection using Random Forest Feature Importance
+	- [x] Update feature selection using Random Forest Feature Importance
+	- [ ] Save trained vectorizer external of preprocessor to enable storage
 
 ### Due Monday, Nov 16
 - [ ] Implement missing value predictor class
