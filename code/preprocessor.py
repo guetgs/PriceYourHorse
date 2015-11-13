@@ -1,11 +1,15 @@
 import numpy as np
 import pandas as pd
 import datetime
+import string
 from feature_dict import Color_dict, Breeds_dict, Sex_dict
-from feature_lists import Breeds, Skills, Colors, Sexes
+from feature_lists import Breeds, Skills, Colors, Sexes, Vocab
 from collections import Counter
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import NMF
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem.wordnet import WordNetLemmatizer
 
 SKILLS = Skills
 
@@ -56,7 +60,7 @@ class BasicPreprocessor(object):
         '''
         df = pd.Series(feature_dict).to_frame().transpose()
         df = self.clean_up(df, fit=False)
-        description = df['Skills / Disciplines']
+        description = df['Description']
         x = self.vec.transform(description)
         W = self.model.transform(x)
         topic = W.argmax()
@@ -104,6 +108,7 @@ class BasicPreprocessor(object):
         Cleans data into consistent format and datatypes.
         '''
         # merge Skills/Disciplines and Description
+        df['Skills / Disciplines'] = df['Skills / Disciplines'].fillna(u'-')
         df['Description'] = df['Description'] + df['Skills / Disciplines']
         # # Create Dummy Variables
         # df['Skills / Disciplines'] = df['Skills / Disciplines'].fillna(u'-')
@@ -239,17 +244,37 @@ class BasicPreprocessor(object):
         Engineers new features, performs nlp.
         '''
         self.df['Age'] = self.df['Foal Date'].apply(self.add_age)
-        
-        self.df.loc[:, 'Topics'] = self.NMF_analysis()
-        self.df = pd.get_dummies(self.df, columns=['Topics'])
 
+        # self.df.loc[:, 'Topics'] = self.NMF_analysis()
+        # self.df = pd.get_dummies(self.df, columns=['Topics'])
 
-        # feature_names = vec.get_feature_names()
-        # words_df = pd.DataFrame(X.todense(), columns=feature_names)
-        # self.df = pd.concat([self.df, words_df], axis=1,\
-        #                     join_axes=[self.df.index])
+        descriptions = self.df['Description']
+        print 'len description', len(descriptions)
+        vec = TfidfVectorizer(strip_accents='unicode',\
+                          stop_words='english',\
+                          ngram_range=(1, 1),\
+                          min_df=100,\
+                          tokenizer=self.tokenizer,\
+                          vocabulary=Vocab,\
+                          use_idf=True)
+        X = vec.fit_transform(descriptions)
+        self.vec = vec
+        print 'shape X ', X.shape
+        feature_names = ['Skill_' + name for name in vec.get_feature_names()]
+        words_df = pd.DataFrame(X.todense(), columns=feature_names)
+        print words_df.describe()
+        self.df = pd.concat([self.df, words_df], axis=1)
+        print 'shape df', self.df.shape
 
         self.df.drop('Description', axis=1, inplace=True)
+
+    def tokenizer(self, s):
+        token = word_tokenize(s.lower())
+        stpw = set(stopwords.words('english'))
+        exclude = set(string.punctuation)
+        clean = [w for w in token if w not in stpw and w not in exclude]
+        wordnet = WordNetLemmatizer()
+        return [wordnet.lemmatize(word) for word in clean]
 
 
         
@@ -303,10 +328,9 @@ class BasicPreprocessor(object):
               u'City', u'State', u'Ad Created', u'Last Update',
               u'Registry Number', u'Registry', u'Ad Number', u'Weight (lbs)']
         for column in rm:
-            print column
             columns.remove(column)
         self.final_columns = columns
-        print 'final columns:\n', columns
+        # print 'final columns:\n', columns
         return self.df[self.final_columns]
 
 

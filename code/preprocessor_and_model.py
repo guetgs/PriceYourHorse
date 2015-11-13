@@ -43,6 +43,7 @@ if __name__ == '__main__':
                                 'State Bred', 'Temperament', 'Weight (lbs)',
                                 'City', 'Pedigree', 'State'],
                                 inplace=True)
+    df = df.reset_index().drop('index', axis=1)
     df_X = df.drop('Price', axis=1)
     preprocessor = BasicPreprocessor()
     clean_df = preprocessor.fit_transform(df_X)
