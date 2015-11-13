@@ -10,11 +10,22 @@
   color: #395F00;
 }
 
+h2, .page-header, .footer {
+  text-align: center;
+}
+
+.inline {
+  color: #D4FF93;
+}
+.inline:hover{
+  color: #9BFF04;
+}
+
 body {
   height: 100%;
   background-color: #395F00;
   color: #fff;
-  text-align: center;
+  text-align: justify;
   text-shadow: 0 1px 3px rgba(0,0,0,.5);
 }
 
