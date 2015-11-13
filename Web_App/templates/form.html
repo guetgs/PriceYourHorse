@@ -1,12 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="inner cover">
-  <h1 class="cover-heading">PriceYourHorse</h1>
-  <p class="lead">Determine The Price Tag</p>
-  <br><br>
   <div class="row">
-          <div class="col-lg-6">
-            <div class="well bs-component">
+   <div class="col-lg-6">
+   <div class="well bs-component">
     <form class="form-horizontal" action='/predictor' method='POST'>
         <fieldset>
           <h2>Please select the characteristics of your horse</h2>
@@ -98,5 +95,7 @@
         </fieldset>
     </form>
     </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

@@ -10,7 +10,9 @@
     <link href="../static/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="../static/css/cover.css" rel="stylesheet">
+    <link href="../static/css/my.css" rel="stylesheet">
+    <!-- Icon -->
+    <link rel='shortcut icon' href='../static/pferd.ico'>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -19,7 +21,7 @@
     <![endif]-->
   </head>
   <body>
-    <div class="navbar navbar-default navbar-fixed-top">
+    <nav class="navbar navbar-default navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
           <a href="/index" class="navbar-brand">Home</a>
@@ -32,29 +34,43 @@
         </div>
         <div class="navbar-collapse collapse" id="navbar-main">
           <ul class="nav navbar-nav">
-            <li>
-              <a href="/submit">Predictor</a>
-            </li>
-            <li>
-              <a href="/about_me">About Me</a>
-            </li>
-            <li>
-              <a href="/details">Details</a>
-            </li>
+            <li><a href="/submit">Predictor</a></li>
+            <li><a href="/about_me">About Me</a></li>
+            <li><a href="/details">Details</a></li>
           </ul>
         </div>
       </div>
-    </div>
+    </nav>
 
-    <div class="site-wrapper">
+    <!-- <div class="site-wrapper">
       <div class="site-wrapper-inner">
-        <div class="cover-container">
-          
-            {% block content %}{% endblock %}
-            
-        </div>
+        <div class="cover-container"> -->
+    <div class="container">
+      <div class="page-header">
+        <h1>PriceYourHorse</h1>
+        <p class="lead">Determine The Price Tag</p>
       </div>
+            {% block content %}{% endblock %}
     </div>
+        <!-- </div>
+      </div>
+    </div> -->
+
+    <footer class="footer">
+      <div class="container">
+        <p class="text-muted">Powered by <br> 
+          <a href='http://pandas.pydata.org/'>Pandas</a>,
+          <a href='http://www.crummy.com/software/BeautifulSoup/'>BeautifulSoup</a>,
+            <a href='https://www.mongodb.org/'>MongoDB</a>,
+            <a href='http://scikit-learn.org/stable/'>scikit-learn</a>,
+            <a href='http://www.nltk.org/'>NLTK</a>,
+            <a href='http://statsmodels.sourceforge.net/'>Statsmodels</a> 
+            and 
+            <a href='http://flask.pocoo.org/'>Flask</a>.
+             <br>Data was scratched from <a href='http://www.equinenow.com/horses.htm'>Equinenow.com</a>.</p>
+      </div>
+    </footer>
+
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
