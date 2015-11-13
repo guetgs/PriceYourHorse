@@ -33,9 +33,9 @@
 	- [x] Update feature selection method
 	
 ### Due Friday, Nov 13
-- [ ] Update web application
-	- [ ] Implement description page
-	- [ ] Implement author information page
+- [x] Update web application
+	- [x] Implement description page
+	- [x] Implement author information page
 - [ ] Update preprocessor
 	- [ ] Update feature selection using Random Forest Feature Importance
 
@@ -64,5 +64,6 @@
 	- [ ] Use missing value predictor class to fill these values
 
 ### Due Saturday, Nov 21
+- [ ] Update the details page of the web-application
 - [ ] Polish all functions and github repo
 - [ ] Final polish on web application and powerpoint presentation
