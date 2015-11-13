@@ -183,3 +183,38 @@ Parameters:
 R^2: 0.706
 OOB: 0.230
 ![Predicted vs Real Plot of all priced Data without outliers, topic dummies](figures/figure_17_PvsY_topics_as_dummies.png)
+
+### Seventh Model
+#####Features:
+- Skills / Disciplines merged with Descriptions, term-frequency matrix 
+- TFidfVectorizer: strip_accents='unicode',\
+                          stop_words='english',\
+                          ngram_range=(1, 1),\
+                          min_df=100,\
+                          tokenizer=self.tokenizer,\
+                          vocabulary=Vocab,\
+                          use_idf=True
+
+- Height (hh) as float (outlier removed, inches converted to hh)
+- Temperament as dummy (extreme vs intermediate values)
+- Age as float (derived from Foal Date)
+- Breed as Dummy Variables (remove selected breeds)
+- Color as Dummy Variables (reduced variable space)
+- Sex as Dummy Variables (reduced variable space)
+- Pedigree is Dummy Variable
+
+#####Model:
+Sklearn's RandomForestRegressor
+
+Parameters:
+- n_estimators: 100
+- max_features: auto
+- oob_score: True
+
+#####Trained only on data with price (prices < 60000):
+R^2: 0.917
+OOB: 0.398
+![Predicted vs Real Plot all priced Data without outliers, vocab](figures/figure_20_PvsY_lemmatized_vocab_only.png)
+
+
+
