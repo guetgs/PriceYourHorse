@@ -6,6 +6,33 @@ Skills = ['Incentive Fund', 'Register Of Merit', 'Companion',\
           'Trail', 'Athletic', 'Longe Line', 'Reining', 'Project',\
           'Trail Riding', 'Racing', 'Show Hack', 'Breeding', 'Pony Club']
 
+Vocab = ['dressage', 'amateur', 'winner', 'level', 'trail', 'hunter',\
+         'championship', 'jumper', 'derby', 'riding', 'change', 'joy',\
+         'prix', 'champion', 'jumping', 'imported', 'king', 'old',\
+         'racehorse', 'showing', 'honest', 'lease', 'hack', 'athletic',\
+         'schooling', 'rider', 'great', 'break', 'finished', 'trained',\
+         'equitation', 'professional', 'junior', 'futurity', 'sport',\
+         'breeding', 'beautiful', 'breeder', 'training', 'uncomplicated',\
+         'pleasure', 'nominated', 'excellent', 'division', 'premium', 'easy',\
+         'sale', 'saddle', 'test', 'movement', 'quality', 'eligible', 'gait',\
+         'experience', 'step', 'act', 'ring', 'eventing', 'performance',\
+         'favorite', 'good', 'earnings', 'ability', 'ridden', 'english',\
+         'talent', 'competitive', 'available', 'school', 'ready',\
+         'registered', 'started', 'rodeo', 'win', 'sire', 'new', 'sweet',\
+         'world', 'brave', 'grand', 'located', 'amazing', 'dam', 'shown',\
+         'need', 'jump', 'cross', 'lot', 'young', 'safe', 'won', 'flashy',\
+         'course', 'reserve', 'make', 'correct', 'information', 'stunning',\
+         'hand', 'successfully', 'lesson', 'experienced', 'lovely',\
+         'exceptional', 'western', 'successful', 'future', 'sporthorse',\
+         'prospect', 'fabulous', 'love', 'sane', 'ethic',\
+         'straight', 'class', 'placed', 'son', 'colt', 'picture', 'mover',\
+         'nice', 'home', 'big', 'reining', 'hauled', 'wonderful',\
+         'super', 'country', 'walk', 'opportunity', 'trainer', 'ribbon',\
+         'ease', 'run', 'form', 'ranch', 'beginner', 'spanish', 'halter',\
+         'included', 'bred', 'gorgeous', 'racing', 'novice', 'cattle',\
+         'potential', 'fantastic', 'heel', 'line', 'competing']
+
+
 Temperaments = ['0/10', '1/10', '2/10', '3/10', '4/10', '5/10',\
                 '6/10', '7/10', '8/10', '9/10', '10/10']
 
