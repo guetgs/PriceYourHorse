@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="page-header">
+        <h1>PriceYourHorse</h1>
+        <p class="lead">Determine The Price Tag</p>
+      </div>
 <div class="inner cover">
   <h2>Details</h2>
-  <p>Under the hood, PriceYourHorse relys on a regression model based on thousands of ads scraped from <a href='http://www.equinenow.com/horses.htm'>www.equinenow.com</a>. Features from tabular, mostly categorical information as well as from the text description are selected based on feature importance and used to fit the final regression model. Missing values in the dataset are derived from the ensembled data set. The final trained model as well as the trained preprocessor required to transform user entries into a feature matrix processable by the model are saved for rapid availability in a web-application. The PriceYourHorse web-application allows the user to select values for all important features previously identified and predicts a price based on the underlying trained model, which is subsequently presented to the user together with his or her feature value selection.</p>
+  <p>Under the hood, PriceYourHorse relys on a regression model based on thousands of ads scraped from <a class="inline" href='http://www.equinenow.com/horses.htm'>www.equinenow.com</a>. Features from tabular, mostly categorical information as well as from the text description are selected based on feature importance and used to fit the final regression model. Missing values in the dataset are derived from the ensembled data set. The final trained model as well as the trained preprocessor required to transform user entries into a feature matrix processable by the model are saved for rapid availability in a web-application. The PriceYourHorse web-application allows the user to select values for all important features previously identified and predicts a price based on the underlying trained model, which is subsequently presented to the user together with his or her feature value selection.</p>
 </div>
 {% endblock %}
