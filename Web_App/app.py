@@ -2,9 +2,9 @@ import flask
 import pickle
 import sys
 import pandas as pd
-from feature_lists import Skills, Temperaments, Breeds, Colors, Sexes
-
 sys.path.append('../code/')
+from feature_lists import Skills, Temperaments, Breeds, Colors, Sexes, Vocab
+
 
 app = flask.Flask(__name__)
 
@@ -18,8 +18,10 @@ def index():
 
 @app.route('/submit')
 def submit():
+    Vocab.sort()
+    print Vocab
     return flask.render_template('form.html',\
-                                 skills=Skills,\
+                                 skills=Vocab,\
                                  temperaments=Temperaments,\
                                  breeds=Breeds,\
                                  colors=Colors,\
@@ -47,6 +49,7 @@ def prediction():
             if form[key] == u'on':
                 data['Skills / Disciplines'].append(key)
         data['Skills / Disciplines'] = str(data['Skills / Disciplines'])
+        data['Description'] = ''
         print data
         x = PREPROCESSOR.transform(data)
         price = PREDICTOR.predict(x)
@@ -73,3 +76,4 @@ if __name__ == '__main__':
         PREDICTOR = pickle.load(f)
     print 'loaded...'
     app.run(host='0.0.0.0', port=8080, debug=True)
+
