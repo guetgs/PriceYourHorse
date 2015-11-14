@@ -36,20 +36,24 @@
 - [x] Update web application
 	- [x] Implement description page
 	- [x] Implement author information page
-- [ ] Update preprocessor
+- [x] Update preprocessor
 	- [x] Update feature selection using Random Forest Feature Importance
-	- [ ] Save trained vectorizer external of preprocessor to enable storage
 
 ### Due Monday, Nov 16
-- [ ] Implement missing value predictor class
-	- [ ] Implement horse to horse similarity score method
-	- [ ] Implement horse to horse similarity matrix calculation method
-	- [ ] Implement missing value prediction method
+- [x] Save trained vectorizer external of preprocessor to enable storage
+	- [x] Implement Processor
+	- [x] Implement Vectorizer
+	- [x] Perform preprocessing outside of Processor class, to similarize entries from training set and from web application
+- [x] Implement missing value predictor class
+	- [x] Implement horse to horse similarity score method
+	- [x] Implement k-means to identify centroids of similar horses
+	- [x] Implement missing value prediction method
+- [ ] Run K-means on whole dataset
 
 ### Due Tuesday, Nov 17
-- [ ] Update preprocessor class
-	- [ ] Implement feature selection of text features using SVD
-	- [ ] Optimize feature selection using model crossvalidation
+- [ ] Update vocabulary
+	- [ ] Perform feature selection of text features
+- [ ] Implement predicted price range
 
 ### Due Wednesdy, Nov 18
 - [ ] Optimize model choice and parameter choice based on crossvalidation
