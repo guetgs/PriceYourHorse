@@ -2,58 +2,283 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import pickle
-import statsmodels.api as sm
-from preprocessor import BasicPreprocessor
+import datetime
+import string
+from pymongo import MongoClient
+from Processor import Processor
+from feature_dict import Breeds_dict, Color_dict, Sex_dict
+from feature_lists import Vocab
+from sklearn.feature_extraction.text import TfidfVectorizer
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem.wordnet import WordNetLemmatizer
 from predictor import Predictor
-from web_scraping import initiate_database
 
 DB_NAME = 'horse_ads_database'
 TABLE_NAME = 'horse_features_all'
 
+PRICE_RANGE = [150, 60000]
+
+FILLNA_METHOD = 'mode'
+N_CENTROIDS = 100
+
+CATEGORIES = ['Breed', 'Color', 'Sex']
+
 MODEL_PARAMS = {'n_estimators': 100,
-                'max_features': 'auto',
+                'max_features': 'sqrt',
                 'oob_score': True,
                 'n_jobs': -1}
 
-def load_all(table):
-    df = pd.DataFrame([x for x in table.find()])
+def plot_predicted_real(y, pred, title, show=True):
+    plt.scatter(y, pred)
+    plt.xlabel('Real Price [$]')
+    plt.ylabel('Predicted Price [$]')
+    plt.title(title)
+    if show:
+        plt.show()
+
+def initiate_database(db_name, table_name):
+    '''
+    INPUT: string, string
+    OUTPUT: mongodb table
+
+    Connects to mongodb database db_name and table table_name through
+    pymongo and returns handle to table.
+    '''
+    client = MongoClient()
+    db = client[db_name]
+    table = db[table_name]
+    return table
+
+
+def load_all(table, price=True):
+    '''
+    INPUT: mongodb table, boolean
+    OUTPUT pandas dataframe
+
+    Depending on the price flag, loads all data or only data containing
+    a price from the mongodb table into a DataFrame.
+    '''
+    if price:
+        df = pd.DataFrame([x for x in table.find({'Price': {'$exists': True}})])
+    else:
+        df = pd.DataFrame([x for x in table.find()])
     return df
 
-def identify_y_outlier_borders(y):
-    y_working = y[y > 0]
-    mean = y_working.mean()
-    std = y_working.std()
-    return 3 * std
+
+def preprocess_dataframe(df):
+    '''
+    INPUT: pandas dataframe
+    OUTPUT: pandas dataframe
+
+    Preprocesses data into a format accepted by the Processor. This involves
+    dropping, merging or adding columns, changing variable types, cleaning
+    data and reducing categories for categorical data.
+    '''
+    df.drop_duplicates(['Breed', 'Color', 'Foal Date', 'Height (hh)',
+                        'In Foal', 'Markings', 'Name', 'Sex',
+                        'State Bred', 'Temperament', 'Weight (lbs)',
+                        'City', 'Pedigree', 'State'],
+                        inplace=True)
+    df['Description'] = df['Description'] + df['Skills / Disciplines']
+    df['Description'] = df['Description']\
+                        .apply(lambda x: '' if x == u'-' else x)
+    df = df.apply(lambda x: x.apply(lambda y: None if y == u'-' else y))
+    df['Foal Date'] = df['Foal Date'].apply(clean_date)
+    df['Age'] = df['Foal Date'].apply(add_age)
+    df.drop([u'In Foal', u'Markings', u'Name', u'State Bred',
+             u'Skills / Disciplines', u'Foal Date', u'_id',
+             u'City', u'State', u'Ad Created', u'Last Update',
+             u'Registry Number', u'Registry', u'Ad Number', u'Weight (lbs)'],
+             axis=1, inplace=True)
+    df['Temperament'] = df['Temperament']\
+                        .apply(lambda s: eval(s + '.')\
+                               if isinstance(s, unicode) else None)
+    df['Height (hh)'] = df['Height (hh)'].apply(clean_height)
+
+    dicts = [Breeds_dict, Color_dict, Sex_dict]
+    for i, cat in enumerate(CATEGORIES):
+        df[cat] = df[cat].apply(lambda x: dicts[i][x] if not pd.isnull(x) else x)
+
+    df['Price'] = df['Price'].apply(clean_price)
+    return df
 
 
-def get_X_y(df):
-    upper_border = 60000
-    complete_df = df[(df['Price'] > 0) & (df['Price'] < upper_border)]
-    y = complete_df.Price.values
-    complete_df = complete_df.drop(['Price', '_id'], axis=1)
-    X = complete_df.values
-    columns = list(complete_df.columns)
-    return X, y, columns
+def fit_processor(df_X):
+    '''
+    INPUT: pandas dataframe
+    OUTPUT: pandas dataframe
+
+    Fits Processor and transforms data into numeric formats suitable for
+    feeding into a model. Saves fitted Processor for further use in
+    web application.
+    '''
+    sets = [set(Breeds_dict.values()),
+            set(Color_dict.values()),
+            set(Sex_dict.values())]
+    p = Processor(sets, CATEGORIES, FILLNA_METHOD)
+    df_X_tabular = p.fit_transform(df_X, N_CENTROIDS)
+    with open('../Web_App/data/processor.pickle', 'wb') as f:
+        pickle.dump(p, f)
+    return df_X_tabular
+
+def fit_vectorizer(descriptions):
+    '''
+    INPUT: list of strings or pandas series of strings
+    OUTPUT: pandas dataframe
+
+    Fits TfidfVectorizer and transforms strings into word feature matrix.
+    Returns dataframe of the feature matrix with feature names as column
+    names.
+    '''
+    vec = TfidfVectorizer(strip_accents='unicode',\
+                          stop_words='english',\
+                          ngram_range=(1, 1),\
+                          min_df=100,\
+                          tokenizer=tokenizer,\
+                          vocabulary=Vocab,\
+                          use_idf=True)
+    X_text = vec.fit_transform(descriptions)
+    feature_names = ['Skill_' + name for name in vec.get_feature_names()]
+    df_X_text = pd.DataFrame(X_text.todense(), columns=feature_names)
+    with open('../Web_App/data/vectorizer.pickle', 'wb') as f:
+        pickle.dump(vec, f)
+    return df_X_text
+    
+
+
+def clean_price(s):
+    '''
+    INPUT: string
+    OUTPUT: float or None
+
+    Converts string containing price into float. Converts Euro into dollar
+    using an exchange rate of 1.1. Returns None if s does not start with
+    either u'$' or unicode for Euro.
+    '''
+    if s[0] == u'\u20ac':
+        return float(s[1:].replace(',', '')) * 1.1
+    if s[0] == u'$':
+        x = s.replace(',', '').split(' ')[0]
+        return float(x[1:])
+    else:
+        print 'error', s
+        return -1.
+
+
+def clean_date(s):
+    '''
+    INPUT: string
+    OUTPUT: pandas datetime
+
+    Converts s to datetime. If automatic conversion fails, asks user to
+    correct the date. Accepts 'None' if date cannot be reasonably
+    corrected.
+    '''
+    try:
+        date = pd.to_datetime(s, errors='raise')
+    except:
+        date = s
+    while isinstance(date, unicode):
+        if date == u'-':
+            return None
+        d = raw_input('Please correct this date: {} '.format(date))
+        if d == 'None':
+            date = None
+        else:
+            date = pd.to_datetime(d)
+    return date
+
+
+def clean_height(h):
+    '''
+    INPUT: string
+    OUTPUT: float
+
+    Transforms hight from string to float. If the value is unrealistically
+    high for a horse, the hight is set to None. If the value appears to
+    be in inches instead of hands, it is converted into hands.
+    '''
+    if isinstance(h, unicode):
+        h = abs(float(h))
+        if h > 90:
+            return None
+        if h > 22:
+            return h * 2.54 / 10.16
+        return h
+    return None
+
+
+def add_age(foal_date):
+    '''
+    INPUT: datetime
+    OUTPUT: float
+
+    Determines horse age from foal date.
+    '''
+    if foal_date:
+        age = datetime.date.today().year - foal_date.year
+        if (age < 0) or (age > 40):
+            age = None
+        return age
+    else:
+        return None
+
+
+def tokenizer(s):
+    '''
+    INPUT: string
+    OUTPUT: list of strings
+
+    Tokenizes string into list of words.
+    '''
+    token = word_tokenize(s.lower())
+    stpw = set(stopwords.words('english'))
+    exclude = set(string.punctuation)
+    clean = [w for w in token if w not in stpw and w not in exclude]
+    wordnet = WordNetLemmatizer()
+    return [wordnet.lemmatize(word) for word in clean]
+
 
 if __name__ == '__main__':
     table = initiate_database(DB_NAME, TABLE_NAME)
-    df = load_all(table)
-    df.drop_duplicates(['Breed', 'Color', 'Foal Date', 'Height (hh)',
-                                'In Foal', 'Markings', 'Name', 'Sex',
-                                'State Bred', 'Temperament', 'Weight (lbs)',
-                                'City', 'Pedigree', 'State'],
-                                inplace=True)
+    df = load_all(table, price=True)
+    print 'dataframe loaded...'
+    df = preprocess_dataframe(df)
+    print 'dataframe preprocessed...'
+    df = df[(df['Price'] > PRICE_RANGE[0]) & (df['Price'] < PRICE_RANGE[1])]
     df = df.reset_index().drop('index', axis=1)
-    df_X = df.drop('Price', axis=1)
-    preprocessor = BasicPreprocessor()
-    clean_df = preprocessor.fit_transform(df_X)
-    clean_df['Price'] = preprocessor.clean_prices(df['Price'])
-    X, y, features = get_X_y(clean_df)
-    print X.shape, y.shape
+
+    # separate target, tabular features, text features
+    y = df['Price'].values
+    descriptions = df['Description']
+    df_X = df.drop(['Price', 'Description'], axis=1)
+    # process tabular features
+    df_X_tabular = fit_processor(df_X)
+    print 'tabular features processed...'
+    # process text features
+    df_X_text = fit_vectorizer(descriptions)
+    print 'text features processed...'
+    
+    df_X_final = pd.concat([df_X_tabular, df_X_text], axis=1)
+    features = df_X_final.columns
+    X = df_X_final.values
+
     model = Predictor(MODEL_PARAMS)
     model.fit(X, y)
-    with open('../Web_App/data/preprocessor.pickle', 'wb') as f:
-        pickle.dump(preprocessor, f)
     with open('../Web_App/data/predictor.pickle', 'wb') as f:
         pickle.dump(model, f)
-   
+    print model.score(X, y)
+    print model.cross_val_score()
+    pred = model.predict(X)
+    plot_predicted_real(y, pred, 'RF model,100 trees, {:1.3f} oob_score'\
+                        .format(model.cross_val_score()))
+
+
+
+
+
+
+
+
+
