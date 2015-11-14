@@ -217,4 +217,60 @@ OOB: 0.398
 ![Predicted vs Real Plot all priced Data without outliers, vocab](figures/figure_20_PvsY_lemmatized_vocab_only.png)
 
 
+## Change in code: separate processor/vectorizer
+###Run I:
+#####Data:
+Only horses with price
+#####Features:
+- Skills / Disciplines merged with Descriptions, term-frequency matrix, use vocab
+- TFidfVectorizer: strip_accents='unicode',\
+                          stop_words='english',\
+                          ngram_range=(1, 1),\
+                          min_df=100,\
+                          tokenizer=tokenizer,\
+                          vocabulary=Vocab,\
+                          use_idf=True
+- tokenizer: WordNetLemmatizer()
+- Height (hh) as float (outlier removed, inches converted to hh)
+- Temperament as float
+- Age as float (derived from Foal Date)
+- Breed as Dummy Variables (according to dict)
+- Color as Dummy Variables (reduced variable space)
+- Sex as Dummy Variables (reduced variable space)
+- Pedigree is Dummy Variable
+- Fillna method: mode for categorical, mean for numeric
+- PRICE_RANGE = [0, 60000]
+
+#####Model:
+Sklearn's RandomForestRegressor
+
+Parameters:
+- n_estimators: 100
+- max_features: auto
+- oob_score: True
+
+#####Trained only on data with price (prices < 60000):
+R^2: 0.915
+OOB: 0.393
+![Predicted vs Real Plot separate vectorizer](figure_21_PvsY_separate_preprocessing_vectorizing.png)
+
+###Run II:
+same as bevore, but
+PRICE_RANGE = [150, 60000]
+R^2: 0.918
+OOB: 0.400
+![Predicted vs Real Plot separate vectorizer](figure_21_PvsY_more_than_150_separate_preprocessing_vectorizing.png)
+
+###Run III:
+same as bevore, but
+
+MODEL_PARAMS = {'n_estimators': 100,
+                'max_features': 'sqrt',
+                'oob_score': True,
+                'n_jobs': -1}
+
+R^2: 0.921
+OOB: 0.417
+![Predicted vs Real Plot separate vectorizer](figure_22_PvsY_more_than_150_separate_preprocessing_vectorizing_sqrt_max_features.png)
+
 
