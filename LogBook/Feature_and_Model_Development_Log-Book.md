@@ -252,14 +252,14 @@ Parameters:
 #####Trained only on data with price (prices < 60000):
 R^2: 0.915
 OOB: 0.393
-![Predicted vs Real Plot separate vectorizer](figure_21_PvsY_separate_preprocessing_vectorizing.png)
+![Predicted vs Real Plot separate vectorizer](figures/figure_21_PvsY_separate_preprocessing_vectorizing.png)
 
 ###Run II:
 same as bevore, but
 PRICE_RANGE = [150, 60000]
 R^2: 0.918
 OOB: 0.400
-![Predicted vs Real Plot separate vectorizer](figure_21_PvsY_more_than_150_separate_preprocessing_vectorizing.png)
+![Predicted vs Real Plot separate vectorizer](figures/figure_21_PvsY_more_than_150_separate_preprocessing_vectorizing.png)
 
 ###Run III:
 same as bevore, but
@@ -271,6 +271,6 @@ MODEL_PARAMS = {'n_estimators': 100,
 
 R^2: 0.921
 OOB: 0.417
-![Predicted vs Real Plot separate vectorizer](figure_22_PvsY_more_than_150_separate_preprocessing_vectorizing_sqrt_max_features.png)
+![Predicted vs Real Plot separate vectorizer](figures/figure_22_PvsY_more_than_150_separate_preprocessing_vectorizing_sqrt_max_features.png)
 
 
