@@ -1,12 +1,16 @@
 import flask
 import pickle
 import sys
+import urllib
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from StringIO import StringIO
 sys.path.append('../code/')
-sys.path.append('../code_temp/')
-from feature_lists import Skills, Temperaments, Breeds, Colors, Sexes, Vocab
-from preprocessor_and_model_temp import tokenizer
+from feature_lists import Vocab, Temperaments
+from feature_dict import Breeds_dict, Color_dict, Sex_dict
+from preprocessor_and_model import tokenizer
 
 
 app = flask.Flask(__name__)
@@ -22,14 +26,20 @@ def index():
 
 @app.route('/submit')
 def submit():
+    dicts = [Breeds_dict,
+             Color_dict,
+             Sex_dict]
+    key_list = [d.keys() for d in dicts]
+    for i, l in enumerate(key_list):
+        key_list[i] = [x for x in l if x not in [u'-', None, np.nan, 'Unknown']]
+        key_list[i].sort()
     Vocab.sort()
-    print Vocab
     return flask.render_template('form.html',\
                                  skills=Vocab,\
                                  temperaments=Temperaments,\
-                                 breeds=Breeds,\
-                                 colors=Colors,\
-                                 sexes=Sexes)
+                                 breeds=key_list[0],\
+                                 colors=key_list[1],\
+                                 sexes=key_list[2])
 
 @app.route('/about_me')
 def about_me():
@@ -45,7 +55,7 @@ def prediction():
     global PREDICTOR
     global VECTORIZER
     if flask.request.method == 'GET':
-        flask.render_template('prediction_noinput.html')
+        return flask.render_template('prediction_noinput.html')
     else:
         print flask.request.form
         df = prepare_dataframe(flask.request.form)
@@ -59,11 +69,53 @@ def prediction():
         
         X = np.hstack((df_X_tabular.values, X_text.todense()))
 
-        price = PREDICTOR.predict(X)
+        price = PREDICTOR.predict(X)[0]
         print X
         print price
-        price = '${}'.format(price[0])
-    return flask.render_template('prediction.html', price=price)
+        price_string = '${}'.format(price)
+        img = prepare_graph(PREDICTOR.predictions(X), price)
+        data = img.getvalue().encode('base64')
+        image_url = 'data:image/png;base64,{}'.format(urllib.quote(data.rstrip('\n')))
+        return flask.render_template('prediction.html', price=price_string,\
+                                  image_url=image_url)
+
+def prepare_graph(preds, price):
+    perc_5 = np.percentile(preds, 5)
+    perc_95 = np.percentile(preds, 95)
+    plt.figure()
+    plt.axvspan(perc_5, perc_95, color='k', alpha=0.3)
+    graph = sns.kdeplot(preds.ravel(), shade=True, color='g', alpha=1)
+    y_max = plt.ylim()[1]
+    plt.axvline(price, ymax=0.89, color='k', alpha=1)
+    plt.annotate('Prediction', xy=(price, 0.8 * y_max),\
+                  xytext=(1.5 * price, 0.82 * y_max), color='k',\
+                  arrowprops={'arrowstyle': '->',\
+                             'facecolor': 'black',\
+                             'alpha': 1,\
+                             'color': 'k',\
+                             'linestyle': 'solid',\
+                             'linewidth': 1})
+    plt.annotate('5 - 95 Percentile',\
+                 xy=((perc_95 + perc_5) / 2, 0.93*y_max),\
+                 ha='center', color='k')
+    plt.annotate('', xy=(perc_5, 0.91 * y_max),\
+                 xytext=(perc_95, 0.91 * y_max), color='k',\
+                 arrowprops={'arrowstyle': '<->',\
+                             'facecolor': 'black',\
+                             'alpha': 1,\
+                             'color': 'k',\
+                             'linestyle': 'solid',\
+                             'linewidth': 1})
+    plt.title('Predictions of individual estimators', fontsize=20, weight='bold')
+    plt.xlabel('Price [$]', fontsize=18)
+    plt.ylabel('Kernel density estimate', fontsize=18)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    plt.tight_layout()
+    image = StringIO()
+    sns.plt.savefig(image, format='png')
+    sns.plt.savefig('graph.png', format='png')
+    return image
 
 def prepare_dataframe(form):
     columns = ['Height (hh)', 'Age', 'Temperament',\
@@ -73,9 +125,14 @@ def prepare_dataframe(form):
     for col in columns:
         data[col] = form[col]
     data['Temperament'] = eval(data['Temperament'] + '.')
-    data['Height (hh)'] = float(data['Height (hh)'])
-    data['Age'] = int(data['Age'])
-
+    if data['Height (hh)']:
+        data['Height (hh)'] = float(data['Height (hh)'])
+    else:
+        data['Height (hh)'] = None
+    if data['Age']:
+        data['Age'] = int(data['Age'])
+    else:
+        data['Age'] = None
 
     data['Description'] = []
     for key in form:

@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="page-header">
-        <h1>PriceYourHorse</h1>
-        <p class="lead">Determine The Price Tag</p>
-      </div>
+  <h1>PriceYourHorse</h1>
+  <p class="lead">Determine The Price Tag</p>
+</div>
 <div class="inner cover">
   <h2>The predicted price for your horse is:</h2>
-  <br>
   <h2>{{price}}<h2>
+    <img src={{image_url}} alt='KDE plot of price estimates' style='float:center;width:80%'>
 </div>
 
 <div class="col-lg-5">
