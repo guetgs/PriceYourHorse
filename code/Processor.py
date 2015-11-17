@@ -9,14 +9,17 @@ class Processor(object):
     Transforms horse information data into a format suitable for
     machine learning models.
     '''
-    def __init__(self, sets, categories, fillna_method='mode'):
+    def __init__(self, dicts, categories, fillna_method='mode'):
         '''
-        INPUT: list of sets, list of strings, string
+        INPUT: list of dictionaries, list of strings, string
         OUTPUT: None
 
         Initializes internal variables.
         '''
-        self.sets = sets
+        self.dicts = dicts
+        self.sets = []
+        for d in self.dicts:
+            self.sets.append(set(d.values()))
         for s in self.sets:
             if None in s:
                 s.remove(None)
@@ -60,9 +63,10 @@ class Processor(object):
         # dummify
         for i, column in enumerate(self.categories):
             for cat in self.sets[i]:
-                df[column + '_' + cat] = df[column].apply(lambda x: 1\
-                                                          if x == cat\
-                                                          else 0)
+                df[column + '_' + cat] = df[column]\
+                                         .apply(lambda x: 1\
+                                                if self.dicts[i][x] == cat\
+                                                else 0)
             df.drop(column, axis=1, inplace=True)
         return df
         

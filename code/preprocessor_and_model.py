@@ -1,17 +1,20 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 import pickle
 import datetime
 import string
+import csv
 from pymongo import MongoClient
 from Processor import Processor
 from feature_dict import Breeds_dict, Color_dict, Sex_dict
-from feature_lists import Vocab
+from feature_lists import Vocab, Vocab_snowball
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.stem.snowball import SnowballStemmer
 from predictor import Predictor
 
 DB_NAME = 'horse_ads_database'
@@ -28,6 +31,7 @@ MODEL_PARAMS = {'n_estimators': 100,
                 'max_features': 'sqrt',
                 'oob_score': True,
                 'n_jobs': -1}
+
 
 def plot_predicted_real(y, pred, title, show=True):
     plt.scatter(y, pred)
@@ -96,9 +100,9 @@ def preprocess_dataframe(df):
                                if isinstance(s, unicode) else None)
     df['Height (hh)'] = df['Height (hh)'].apply(clean_height)
 
-    dicts = [Breeds_dict, Color_dict, Sex_dict]
-    for i, cat in enumerate(CATEGORIES):
-        df[cat] = df[cat].apply(lambda x: dicts[i][x] if not pd.isnull(x) else x)
+    # dicts = [Breeds_dict, Color_dict, Sex_dict]
+    # for i, cat in enumerate(CATEGORIES):
+    #     df[cat] = df[cat].apply(lambda x: dicts[i][x] if not pd.isnull(x) else x)
 
     df['Price'] = df['Price'].apply(clean_price)
     return df
@@ -113,10 +117,10 @@ def fit_processor(df_X):
     feeding into a model. Saves fitted Processor for further use in
     web application.
     '''
-    sets = [set(Breeds_dict.values()),
-            set(Color_dict.values()),
-            set(Sex_dict.values())]
-    p = Processor(sets, CATEGORIES, FILLNA_METHOD)
+    dicts = [Breeds_dict,
+             Color_dict,
+             Sex_dict]
+    p = Processor(dicts, CATEGORIES, FILLNA_METHOD)
     df_X_tabular = p.fit_transform(df_X, N_CENTROIDS)
     with open('../Web_App/data/processor.pickle', 'wb') as f:
         pickle.dump(p, f)
@@ -237,7 +241,19 @@ def tokenizer(s):
     exclude = set(string.punctuation)
     clean = [w for w in token if w not in stpw and w not in exclude]
     wordnet = WordNetLemmatizer()
-    return [wordnet.lemmatize(word) for word in clean]
+    lemmatized = [wordnet.lemmatize(word) for word in clean]
+    snowball = SnowballStemmer('english')
+    stemmed = [snowball.stem(word) for word in clean]
+    return lemmatized
+
+def feature_importance_analysis(features, model):
+    importances, rank = model.feature_importance()
+    ranked_imp = zip(np.array(features)[rank], importances[rank])
+    print ranked_imp[:50]
+    vocabulary = [w for w in np.array(features)[rank] if w[:6] == 'Skill_']
+    with open('vocab.csv', 'w') as f:
+        wr = csv.writer(f, delimiter=',')
+        wr.writerow(vocabulary[:200])
 
 
 if __name__ == '__main__':
@@ -273,6 +289,8 @@ if __name__ == '__main__':
     pred = model.predict(X)
     plot_predicted_real(y, pred, 'RF model,100 trees, {:1.3f} oob_score'\
                         .format(model.cross_val_score()))
+
+
 
 
 

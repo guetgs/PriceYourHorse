@@ -6,15 +6,15 @@ Skills = ['Incentive Fund', 'Register Of Merit', 'Companion',\
           'Trail', 'Athletic', 'Longe Line', 'Reining', 'Project',\
           'Trail Riding', 'Racing', 'Show Hack', 'Breeding', 'Pony Club']
 
-Vocab = ['dressage', 'amateur', 'winner', 'level', 'trail', 'hunter',\
+Vocab_long = ['dressage', 'amateur', 'winner', 'level', 'trail', 'hunter',\
          'championship', 'jumper', 'derby', 'riding', 'change', 'joy',\
          'prix', 'champion', 'jumping', 'imported', 'king', 'old',\
          'racehorse', 'showing', 'honest', 'lease', 'hack', 'athletic',\
-         'schooling', 'rider', 'great', 'break', 'finished', 'trained',\
+         'schooling', 'great', 'break', 'finished', 'trained',\
          'equitation', 'professional', 'junior', 'futurity', 'sport',\
          'breeding', 'beautiful', 'breeder', 'training', 'uncomplicated',\
          'pleasure', 'nominated', 'excellent', 'division', 'premium', 'easy',\
-         'sale', 'saddle', 'test', 'movement', 'quality', 'eligible', 'gait',\
+         'sale', 'saddle', 'test', 'movement', 'quality', 'gait',\
          'experience', 'step', 'act', 'ring', 'eventing', 'performance',\
          'favorite', 'good', 'earnings', 'ability', 'ridden', 'english',\
          'talent', 'competitive', 'available', 'school', 'ready',\
@@ -31,6 +31,56 @@ Vocab = ['dressage', 'amateur', 'winner', 'level', 'trail', 'hunter',\
          'ease', 'run', 'form', 'ranch', 'beginner', 'spanish', 'halter',\
          'included', 'bred', 'gorgeous', 'racing', 'novice', 'cattle',\
          'potential', 'fantastic', 'heel', 'line', 'competing']
+
+Vocab = ['dressage', 'amateur', 'winner', 'level', 'trail', 'hunter',\
+         'championship', 'jumper', 'derby', 'joy',\
+         'prix', 'imported', 'old',\
+         'racehorse', 'showing', 'honest', 'hack', 'athletic',\
+         'schooling', 'great', 'break', 'finished', 'trained',\
+         'professional', 'junior', 'futurity', 'sport',\
+         'breeding', 'beautiful', 'uncomplicated',\
+         'pleasure', 'nominated', 'excellent', 'division', 'premium', 'easy',\
+         'movement', 'quality', 'gait',\
+         'experience', 'step', 'eventing', 'performance',\
+         'favorite', 'good', 'ridden', 'english',\
+         'talent', 'competitive', 'ready',\
+         'registered', 'started', 'rodeo', 'sweet',\
+         'brave', 'amazing',\
+         'cross', 'young', 'safe', 'flashy',\
+         'reserve', 'stunning',\
+         'hand', 'lesson', 'lovely',\
+         'exceptional', 'western', 'successful',\
+         'prospect', 'fabulous', 'sane',\
+         'straight', 'placed',\
+         'nice', 'home', 'big', 'reining', 'hauled', 'wonderful',\
+         'walk', 'opportunity',\
+         'form', 'ranch', 'beginner', 'halter',\
+         'cattle',\
+         'potential']
+
+Vocab_snowball = ['dressag', 'amateur', 'level', 'hunter', 'winner', 'jump',\
+                  'import', 'jumper', 'champion', 'movement', 'chang',\
+                  'success', 'trail', 'school', 'profession', 'talent',\
+                  'sport', 'train', 'old', 'premium', 'junior', 'score',\
+                  'joy', 'sporthors', 'western', 'grand', 'hack', 'experi',\
+                  'event', 'honest', 'compet', 'great', 'easi', 'pleasur',\
+                  'athlet', 'breed', 'futur', 'english', 'competit', 'love',\
+                  'spanish', 'win', 'beauti', 'ridden', 'warmblood', \
+                  'uncompl', 'excel', 'perform', 'championship', 'race',\
+                  'work', 'locat', 'shown', 'super', 'regist', 'bred',\
+                  'qualiti', 'stake', 'start', 'good', 'mover', 'nice',\
+                  'racehors', 'ribbon', 'readi', 'experienc', 'beginn',\
+                  'safe', 'intern', 'cross', 'brave', 'class', 'final',\
+                  'barrel', 'home', 'place', 'prospect', 'young', 'hunt',\
+                  'finish', 'amaz', 'hand', 'flashi', 'auto', 'look', 'stun',\
+                  'wonder', 'canter', 'world', 'breeder', 'impress', 'broke',\
+                  'filli', 'potenti', 'sweet', 'walk', 'gait', 'elig',\
+                  'price', 'season', 'halter', 'stand', 'trot', 'won',\
+                  'gorgeous', 'lot', 'fantast', 'rare', 'fenc', 'divis',\
+                  'line', 'state', 'incred', 'reserv', 'alway', 'correct',\
+                  'lesson', 'big', 'sane', 'eleg', 'littl', 'foal', 'produc',\
+                  'tempera', 'absolut', 'perfect', 'entir']
+
 
 
 Temperaments = ['0/10', '1/10', '2/10', '3/10', '4/10', '5/10',\

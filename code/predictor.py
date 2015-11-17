@@ -18,6 +18,11 @@ class Predictor(object):
     def predict(self, X):
         return self.model.predict(X)
 
+    def predictions(self, X):
+        trees = self.model.estimators_
+        preds = [tree.predict(X) for tree in trees]
+        return np.array(preds)
+
     def score(self, X, y):
         return self.model.score(X, y)
 
