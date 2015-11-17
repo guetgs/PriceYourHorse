@@ -51,9 +51,9 @@
 - [ ] Run K-means on whole dataset
 
 ### Due Tuesday, Nov 17
-- [ ] Update vocabulary
-	- [ ] Perform feature selection of text features
-- [ ] Implement predicted price range
+- [x] Update vocabulary
+	- [x] Perform feature selection of text features
+- [x] Implement predicted price range
 
 ### Due Wednesdy, Nov 18
 - [ ] Optimize model choice and parameter choice based on crossvalidation
@@ -61,6 +61,7 @@
 
 ### Due Thursday, Nov 19
 - [ ] Adjust user entry form of web application to the final feature selection
+- [ ] Update Readme of Github repo
 - [ ] Polish look of web application
 - [ ] Implement 3min power point presentation of the project
 
