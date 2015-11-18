@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 from collections import Counter
 
-from timeit import default_timer as timer
 
 class Kmeans_DF(object):
     '''
@@ -35,7 +34,8 @@ class Kmeans_DF(object):
 
         Initializes centroids to random points in the dataset.
         '''
-        inds = np.random.choice(range(0, self.n_points), size=self.k, replace=False)
+        inds = np.random.choice(range(0, self.n_points),
+                                size=self.k, replace=False)
         self.centroids = self.points.iloc[inds, :]
 
     def get_distances(self):
@@ -47,7 +47,8 @@ class Kmeans_DF(object):
         '''
         self.distances = []
         for i, point in self.points.iterrows():
-            dist = [self.dist_func(point, x[1]) for x in self.centroids.iterrows()]
+            dist = [self.dist_func(point, x[1])
+                    for x in self.centroids.iterrows()]
             self.distances.append(dist)
 
     def assign_points(self):
@@ -102,7 +103,6 @@ class Kmeans_DF(object):
             most_common_values[column] = most_common
         return pd.Series(most_common_values)
 
-
     def get_centroids(self):
         '''
         INPUT: None
@@ -117,7 +117,7 @@ class Kmeans_DF(object):
         while it < self.max_iter:
             self.get_distances()
             self.assign_points()
-            if self.done == True:
+            if self.done is True:
                 break
             self.move_centroids()
             it += 1
@@ -139,16 +139,10 @@ class Kmeans_DF(object):
         while it < self.max_iter:
             self.get_distances()
             self.assign_points()
-            if self.done == True:
+            if self.done is True:
                 break
             self.move_centroids()
             it += 1
             if np.mod(it, 5) == 0:
                 print '{} iterations done ...'.format(it)
         return self.assignments.reshape(1, len(self.assignments))[0]
-
-
-
-
-
-
