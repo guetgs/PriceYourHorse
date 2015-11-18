@@ -57,21 +57,15 @@ def prediction():
     if flask.request.method == 'GET':
         return flask.render_template('prediction_noinput.html')
     else:
-        print flask.request.form
         df = prepare_dataframe(flask.request.form)
-        print df
         X_text = VECTORIZER.transform(df['Description'])
-        print 'shape X_text: ', X_text.todense()
 
         df_X = df.drop('Description', axis=1)
         df_X_tabular = PROCESSOR.transform(df_X)
-        print 'shape df_X_tabular: ', df_X_tabular.values
         
         X = np.hstack((df_X_tabular.values, X_text.todense()))
 
         price = PREDICTOR.predict(X)[0]
-        print X
-        print price
         price_string = '${}'.format(price)
         img = prepare_graph(PREDICTOR.predictions(X), price)
         data = img.getvalue().encode('base64')
@@ -88,7 +82,7 @@ def prepare_graph(preds, price):
     y_max = plt.ylim()[1]
     plt.axvline(price, ymax=0.89, color='k', alpha=1)
     plt.annotate('Prediction', xy=(price, 0.8 * y_max),\
-                  xytext=(1.5 * price, 0.82 * y_max), color='k',\
+                  xytext=(price + 3000, 0.82 * y_max), color='k',\
                   arrowprops={'arrowstyle': '->',\
                              'facecolor': 'black',\
                              'alpha': 1,\
@@ -114,7 +108,6 @@ def prepare_graph(preds, price):
     plt.tight_layout()
     image = StringIO()
     sns.plt.savefig(image, format='png')
-    sns.plt.savefig('graph.png', format='png')
     return image
 
 def prepare_dataframe(form):
@@ -133,10 +126,8 @@ def prepare_dataframe(form):
         data['Age'] = int(data['Age'])
     else:
         data['Age'] = None
-
     data['Description'] = []
     for key in form:
-        print form[key]
         if form[key] == u'on':
             data['Description'].append(key)
     data['Description'] = ', '.join([x for x in data['Description']])
