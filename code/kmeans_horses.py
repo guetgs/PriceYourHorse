@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from collections import Counter
 
+from timeit import default_timer as timer
+
 class Kmeans_DF(object):
     '''
     K-means classifier working on pandas dataframes.
@@ -45,9 +47,7 @@ class Kmeans_DF(object):
         '''
         self.distances = []
         for i, point in self.points.iterrows():
-            dist = []
-            for j, cent in self.centroids.iterrows():
-                dist.append(self.dist_func(point, cent))
+            dist = [self.dist_func(point, x[1]) for x in self.centroids.iterrows()]
             self.distances.append(dist)
 
     def assign_points(self):
