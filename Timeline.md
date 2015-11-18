@@ -63,13 +63,14 @@
 - [x] Adjust user entry form of web application to the final feature selection
 - [ ] Update Readme of Github repo
 - [ ] Polish look of web application
-- [ ] Implement 3min power point presentation of the project
+- [ ] Polish all functions and github repo
+
 
 ### Due Friday, Nov 20
-- [ ] Implement the option for user to not select some features
-	- [ ] Use missing value predictor class to fill these values
+- [ ] Polish LogBook
+- [ ] Implement 3min power point presentation of the project
+
 
 ### Due Saturday, Nov 21
 - [ ] Update the details page of the web-application
-- [ ] Polish all functions and github repo
 - [ ] Final polish on web application and powerpoint presentation
