@@ -14,11 +14,11 @@ def get_filename():
     INPUT: None
     OUTPUT: string
 
-    Generator that yields all filenames present in 
+    Generator that yields all filenames present in
     the advertisement folder.
     '''
     for filename in os.listdir(ADS_PATH):
-        if not filename in ['.DS_Store', 'horse-ad-.html']:
+        if filename not in ['.DS_Store', 'horse-ad-.html']:
             yield filename
 
 
