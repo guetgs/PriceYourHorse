@@ -1,4 +1,5 @@
 # Feature and Model Development Log-Book
+## Feature optimization
 ### First Model
 #####Features:
 - Skills / Disciplines Dummy Variables
@@ -272,5 +273,154 @@ MODEL_PARAMS = {'n_estimators': 100,
 R^2: 0.921
 OOB: 0.417
 ![Predicted vs Real Plot separate vectorizer](figures/figure_22_PvsY_more_than_150_separate_preprocessing_vectorizing_sqrt_max_features.png)
+
+## Model optimization
+### Current Random Forest Predictor against Default Models
+Use 5-fold cross-validation
+Default parameters for all models
+Predictor Parameter: MODEL_PARAMS = {'n_estimators': 100,
+                'max_features': 'sqrt',
+                'oob_score': True,
+                'n_jobs': -1}
+
+![Model Comparison](figures/Model_Comp_1.png)
+
+### Explore parameter space of other models
+MODEL_PARAMS = {'n_estimators': 100,
+                'max_features': 'sqrt',
+                'oob_score': True,
+                'n_jobs': -1}
+
+RF_PARAMS = {'n_estimators': 100,
+             'max_features': 5,
+             'oob_score': True,
+             'n_jobs': -1}
+
+GB_PARAMS = {'loss': 'lad',
+             'learning_rate': 0.1,
+             'n_estimators': 100,
+             'max_depth': 3,
+             'max_features': 'sqrt',
+             'alpha': 0.9}
+
+SVR_PARAMS = {'kernel': 'rbf',
+              'C': 0.1,
+              'epsilon': 0.1}
+
+![Model Comparison](figures/Model_Comp_2.png)
+
+MODEL_PARAMS = {'n_estimators': 100,
+                'max_features': 'sqrt',
+                'oob_score': True,
+                'n_jobs': -1}
+
+RF_PARAMS = {'n_estimators': 100,
+             'max_features': 20,
+             'oob_score': True,
+             'n_jobs': -1}
+
+GB_PARAMS = {'loss': 'huber',
+             'learning_rate': 0.1,
+             'n_estimators': 100,
+             'max_depth': 3,
+             'max_features': 'sqrt',
+             'alpha': 0.9}
+
+SVR_PARAMS = {'kernel': 'rbf',
+              'C': 0.5,
+              'epsilon': 0.2}
+
+![Model Comparison](figures/Model_Comp_3.png)
+
+MODEL_PARAMS = {'n_estimators': 100,
+                'max_features': 'sqrt',
+                'oob_score': True,
+                'n_jobs': -1}
+
+RF_PARAMS = {'n_estimators': 200,
+             'max_features': 20,
+             'oob_score': True,
+             'n_jobs': -1}
+
+GB_PARAMS = {'loss': 'huber',
+             'learning_rate': 0.05,
+             'n_estimators': 200,
+             'max_depth': 3,
+             'max_features': 'sqrt',
+             'alpha': 0.9}
+
+SVR_PARAMS = {'kernel': 'poly',
+              'C': 0.5,
+              'epsilon': 0.2}
+
+![Model Comparison](figures/Model_Comp_4.png)
+
+MODEL_PARAMS = {'n_estimators': 100,
+                'max_features': 'sqrt',
+                'oob_score': True,
+                'n_jobs': -1}
+
+RF_PARAMS = {'n_estimators': 200,
+             'max_features': 20,
+             'oob_score': True,
+             'n_jobs': -1}
+
+GB_PARAMS = {'loss': 'ls',
+             'learning_rate': 0.05,
+             'n_estimators': 200,
+             'max_depth': 3,
+             'max_features': 'sqrt',
+             'alpha': 0.9}
+
+SVR_PARAMS = {'kernel': 'poly',
+              'C': 0.5,
+              'epsilon': 0.2}
+
+![Model Comparison](figures/Model_Comp_5.png)
+
+MODEL_PARAMS = {'n_estimators': 400,
+                'max_features': 'sqrt',
+                'oob_score': True,
+                'n_jobs': -1}
+
+RF_PARAMS = {'n_estimators': 200,
+             'max_features': 20,
+             'oob_score': True,
+             'n_jobs': -1}
+
+GB_PARAMS = {'loss': 'ls',
+             'learning_rate': 0.05,
+             'n_estimators': 200,
+             'max_depth': 3,
+             'max_features': 'sqrt',
+             'alpha': 0.9}
+
+SVR_PARAMS = {'kernel': 'poly',
+              'C': 0.5,
+              'epsilon': 0.2}
+![Model Comparison](figures/Model_Comp_8_more_estimators.png)
+
+
+### Use maximum of KDE as predicted value in Predictor
+    def predict(self, X):
+        preds = self.predictions(X)
+        p = []
+        for row in preds.T:
+            fig = plt.figure()
+            graph = sns.kdeplot(row.ravel(), shade=True, color='g', alpha=1)
+            x,y = graph.get_lines()[0].get_data()
+            ind = np.argmax(y)
+            price = np.round(x[ind], decimals=-1)
+            p.append(price)
+            plt.close(fig)
+            graph = None
+        return np.array(p)
+![Model Comparison](figures/Model_Comp_6_alternative_predict_function.png)
+
+### Use median predicted value in Predictor
+    def predict(self, X):
+        preds = self.predictions(X)
+        return np.median(preds, axis=0)
+![Model Comparison](Model_Comp_7_median_prediction.png)
 
 
