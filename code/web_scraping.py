@@ -1,8 +1,5 @@
 import numpy as np
 import requests
-# import pandas as pd
-# import datetime
-# import re
 import pickle
 import os
 import threading
@@ -281,5 +278,5 @@ if __name__ == '__main__':
     # current_link = 75091 # link at which to continue scraping
     # continue_at_custom_link(url, table, current_link)
 
-    #     version to update database with results previously not present
+    # version to update database with results previously not present
     update_database(url, table)
