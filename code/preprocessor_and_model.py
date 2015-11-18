@@ -269,6 +269,7 @@ if __name__ == '__main__':
     y = df['Price'].values
     descriptions = df['Description']
     df_X = df.drop(['Price', 'Description'], axis=1)
+    df_X.to_json('Processor_input_dataframe.json')
     # process tabular features
     df_X_tabular = fit_processor(df_X)
     print 'tabular features processed...'
@@ -279,6 +280,10 @@ if __name__ == '__main__':
     df_X_final = pd.concat([df_X_tabular, df_X_text], axis=1)
     features = df_X_final.columns
     X = df_X_final.values
+    with open('X.pickle', 'wb') as f:
+        pickle.dump(X, f)
+    with open('y.pickle', 'wb') as f:
+        pickle.dump(y, f)
 
     model = Predictor(MODEL_PARAMS)
     model.fit(X, y)
