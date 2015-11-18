@@ -1,9 +1,11 @@
 import pandas as pd
 from kmeans_horses import Kmeans_DF
 
+
 df = pd.read_json('Processor_input_dataframe.json')
 max_age = max(df['Age'].values)
 max_delta_h = max(df['Height (hh)']) - min(df['Height (hh)'])
+
 
 def horse_horse_distance(series1, series2):
     '''
@@ -20,14 +22,14 @@ def horse_horse_distance(series1, series2):
             N -= 1
         elif series1[col] != series2[col]:
             dist += 1
-    if not (pd.isnull(series1['Height (hh)'])\
-            or pd.isnull(series2['Height (hh)'])):
+    if not (pd.isnull(series1['Height (hh)']) or
+            pd.isnull(series2['Height (hh)'])):
         dist += abs(series1['Height (hh)'] - series2['Height (hh)'])\
                 / max_delta_h
     else:
         N -= 1
-    if not (pd.isnull(series1['Temperament'])\
-            or pd.isnull(series2['Temperament'])):
+    if not (pd.isnull(series1['Temperament']) or
+            pd.isnull(series2['Temperament'])):
         dist += abs(series1['Temperament'] - series2['Temperament'])
     else:
         N -= 1
@@ -38,11 +40,9 @@ def horse_horse_distance(series1, series2):
     return (dist / N - 1. / 8) * 8. / 7
 
 if __name__ == '__main__':
-    for k in [10, 50, 100, 200]:
+    for k in [50, 100, 200]:
         filename = 'Centroids_' + str(k) + '.json'
         kmeans = Kmeans_DF(df, k, horse_horse_distance)
         centroids = kmeans.get_centroids()
         centroids.to_json(filename)
-        print str(k) + ' is done...'
-
-
+        print(str(k) + ' is done...')
