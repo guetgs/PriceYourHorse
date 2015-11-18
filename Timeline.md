@@ -56,11 +56,11 @@
 - [x] Implement predicted price range
 
 ### Due Wednesdy, Nov 18
-- [ ] Optimize model choice and parameter choice based on crossvalidation
-- [ ] Optimize feature selection for choosen model
+- [x] Optimize model choice and parameter choice based on crossvalidation
+- [x] Optimize feature selection for choosen model
 
 ### Due Thursday, Nov 19
-- [ ] Adjust user entry form of web application to the final feature selection
+- [x] Adjust user entry form of web application to the final feature selection
 - [ ] Update Readme of Github repo
 - [ ] Polish look of web application
 - [ ] Implement 3min power point presentation of the project
