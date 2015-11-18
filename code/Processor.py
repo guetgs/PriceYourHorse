@@ -28,7 +28,7 @@ class Processor(object):
         self.max_age = 30
         self.centroids = None
         self.method = fillna_method
-        
+
     def fit_transform(self, df, k=100):
         '''
         INPUT: pandas dataframe, int
@@ -64,12 +64,11 @@ class Processor(object):
         for i, column in enumerate(self.categories):
             for cat in self.sets[i]:
                 df[column + '_' + cat] = df[column]\
-                                         .apply(lambda x: 1\
-                                                if self.dicts[i][x] == cat\
+                                         .apply(lambda x: 1
+                                                if self.dicts[i][x] == cat
                                                 else 0)
             df.drop(column, axis=1, inplace=True)
         return df
-        
 
     def fit_most_common_values(self, df):
         '''
@@ -111,7 +110,7 @@ class Processor(object):
                     for j, cen in self.centroids.iterrows():
                         dist.append(self.horse_horse_distance(point, cent))
                     closest_cen = self.centroids.iloc[np.argmin(dist), :]
-                    df.loc[i, :] = [x if not pd.isnull(x) else closest_cen[k]\
+                    df.loc[i, :] = [x if not pd.isnull(x) else closest_cen[k]
                                     for k, x in enumerate(point)]
         else:
             print 'error, no method selected for fillna'
@@ -132,14 +131,14 @@ class Processor(object):
                 N -= 1
             elif series1[col] != series2[col]:
                 dist += 1
-        if not (pd.isnull(series1['Height (hh)'])\
-                or pd.isnull(series2['Height (hh)'])):
+        if not (pd.isnull(series1['Height (hh)']) or
+                pd.isnull(series2['Height (hh)'])):
             dist += abs(series1['Height (hh)'] - series2['Height (hh)'])\
                     / self.max_delta_h
         else:
             N -= 1
-        if not (pd.isnull(series1['Temperament'])\
-                or pd.isnull(series2['Temperament'])):
+        if not (pd.isnull(series1['Temperament']) or
+                pd.isnull(series2['Temperament'])):
             dist += abs(series1['Temperament'] - series2['Temperament'])
         else:
             N -= 1
@@ -148,6 +147,3 @@ class Processor(object):
         else:
             N -= 1
         return (dist / N - 1. / 8) * 8. / 7
-
-
-
