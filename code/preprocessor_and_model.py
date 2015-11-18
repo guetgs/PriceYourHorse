@@ -4,18 +4,14 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pickle
 import datetime
-import string
 import csv
 from pymongo import MongoClient
-from Processor import Processor
 from feature_dict import Breeds_dict, Color_dict, Sex_dict
-from feature_lists import Vocab, Vocab_snowball
+from feature_lists import Vocab
 from sklearn.feature_extraction.text import TfidfVectorizer
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-from nltk.stem.wordnet import WordNetLemmatizer
-from nltk.stem.snowball import SnowballStemmer
-from predictor import Predictor
+from tokenizer import tokenizer
+from Processor import Processor
+from predictor import RF_Predictor
 
 DB_NAME = 'horse_ads_database'
 TABLE_NAME = 'horse_features_all'
@@ -32,14 +28,6 @@ MODEL_PARAMS = {'n_estimators': 100,
                 'oob_score': True,
                 'n_jobs': -1}
 
-
-def plot_predicted_real(y, pred, title, show=True):
-    plt.scatter(y, pred)
-    plt.xlabel('Real Price [$]')
-    plt.ylabel('Predicted Price [$]')
-    plt.title(title)
-    if show:
-        plt.show()
 
 def initiate_database(db_name, table_name):
     '''
@@ -64,7 +52,8 @@ def load_all(table, price=True):
     a price from the mongodb table into a DataFrame.
     '''
     if price:
-        df = pd.DataFrame([x for x in table.find({'Price': {'$exists': True}})])
+        df = pd.DataFrame([x for x in
+                           table.find({'Price': {'$exists': True}})])
     else:
         df = pd.DataFrame([x for x in table.find()])
     return df
@@ -83,10 +72,10 @@ def preprocess_dataframe(df):
                         'In Foal', 'Markings', 'Name', 'Sex',
                         'State Bred', 'Temperament', 'Weight (lbs)',
                         'City', 'Pedigree', 'State'],
-                        inplace=True)
+                       inplace=True)
     df['Description'] = df['Description'] + df['Skills / Disciplines']
-    df['Description'] = df['Description']\
-                        .apply(lambda x: '' if x == u'-' else x)
+    df['Description'] = df['Description'].apply(lambda x: '' if x == u'-'
+                                                else x)
     df = df.apply(lambda x: x.apply(lambda y: None if y == u'-' else y))
     df['Foal Date'] = df['Foal Date'].apply(clean_date)
     df['Age'] = df['Foal Date'].apply(add_age)
@@ -94,16 +83,11 @@ def preprocess_dataframe(df):
              u'Skills / Disciplines', u'Foal Date', u'_id',
              u'City', u'State', u'Ad Created', u'Last Update',
              u'Registry Number', u'Registry', u'Ad Number', u'Weight (lbs)'],
-             axis=1, inplace=True)
-    df['Temperament'] = df['Temperament']\
-                        .apply(lambda s: eval(s + '.')\
-                               if isinstance(s, unicode) else None)
+            axis=1, inplace=True)
+    df['Temperament'] = df['Temperament'].apply(lambda s: eval(s + '.')
+                                                if isinstance(s, unicode)
+                                                else None)
     df['Height (hh)'] = df['Height (hh)'].apply(clean_height)
-
-    # dicts = [Breeds_dict, Color_dict, Sex_dict]
-    # for i, cat in enumerate(CATEGORIES):
-    #     df[cat] = df[cat].apply(lambda x: dicts[i][x] if not pd.isnull(x) else x)
-
     df['Price'] = df['Price'].apply(clean_price)
     return df
 
@@ -126,6 +110,7 @@ def fit_processor(df_X):
         pickle.dump(p, f)
     return df_X_tabular
 
+
 def fit_vectorizer(descriptions):
     '''
     INPUT: list of strings or pandas series of strings
@@ -135,12 +120,12 @@ def fit_vectorizer(descriptions):
     Returns dataframe of the feature matrix with feature names as column
     names.
     '''
-    vec = TfidfVectorizer(strip_accents='unicode',\
-                          stop_words='english',\
-                          ngram_range=(1, 1),\
-                          min_df=100,\
-                          tokenizer=tokenizer,\
-                          vocabulary=Vocab,\
+    vec = TfidfVectorizer(strip_accents='unicode',
+                          stop_words='english',
+                          ngram_range=(1, 1),
+                          min_df=100,
+                          tokenizer=tokenizer,
+                          vocabulary=Vocab,
                           use_idf=True)
     X_text = vec.fit_transform(descriptions)
     feature_names = ['Skill_' + name for name in vec.get_feature_names()]
@@ -148,7 +133,6 @@ def fit_vectorizer(descriptions):
     with open('../Web_App/data/vectorizer.pickle', 'wb') as f:
         pickle.dump(vec, f)
     return df_X_text
-    
 
 
 def clean_price(s):
@@ -229,24 +213,29 @@ def add_age(foal_date):
         return None
 
 
-def tokenizer(s):
+def plot_predicted_real(y, pred, title, show=True):
     '''
-    INPUT: string
-    OUTPUT: list of strings
+    INPUT: 1D array, 1D array, string, boolean
+    OUTPUT: None
 
-    Tokenizes string into list of words.
+    Plots predictions vs real values in a scatter plot.
     '''
-    token = word_tokenize(s.lower())
-    stpw = set(stopwords.words('english'))
-    exclude = set(string.punctuation)
-    clean = [w for w in token if w not in stpw and w not in exclude]
-    wordnet = WordNetLemmatizer()
-    lemmatized = [wordnet.lemmatize(word) for word in clean]
-    snowball = SnowballStemmer('english')
-    stemmed = [snowball.stem(word) for word in clean]
-    return lemmatized
+    plt.scatter(y, pred)
+    plt.xlabel('Real Price [$]')
+    plt.ylabel('Predicted Price [$]')
+    plt.title(title)
+    if show:
+        plt.show()
+
 
 def feature_importance_analysis(features, model):
+    '''
+    INPUT: list, trained RF_Predictor model
+    OUTPUT: None
+
+    Prints the 50 highest ranked features with their importance scores
+    and saves the 200 most important skill features as csv.
+    '''
     importances, rank = model.feature_importance()
     ranked_imp = zip(np.array(features)[rank], importances[rank])
     print ranked_imp[:50]
@@ -257,26 +246,28 @@ def feature_importance_analysis(features, model):
 
 
 if __name__ == '__main__':
+    # load data, preprocess features and select training set.
     table = initiate_database(DB_NAME, TABLE_NAME)
     df = load_all(table, price=True)
-    print 'dataframe loaded...'
+    print('dataframe loaded...')
     df = preprocess_dataframe(df)
-    print 'dataframe preprocessed...'
+    print('dataframe preprocessed...')
     df = df[(df['Price'] > PRICE_RANGE[0]) & (df['Price'] < PRICE_RANGE[1])]
     df = df.reset_index().drop('index', axis=1)
 
-    # separate target, tabular features, text features
+    # separate target, tabular features and text features
     y = df['Price'].values
     descriptions = df['Description']
     df_X = df.drop(['Price', 'Description'], axis=1)
     df_X.to_json('Processor_input_dataframe.json')
     # process tabular features
     df_X_tabular = fit_processor(df_X)
-    print 'tabular features processed...'
+    print('tabular features processed...')
     # process text features
     df_X_text = fit_vectorizer(descriptions)
-    print 'text features processed...'
-    
+    print('text features processed...')
+
+    # merge tabular and text features
     df_X_final = pd.concat([df_X_tabular, df_X_text], axis=1)
     features = df_X_final.columns
     X = df_X_final.values
@@ -285,23 +276,15 @@ if __name__ == '__main__':
     with open('y.pickle', 'wb') as f:
         pickle.dump(y, f)
 
-    model = Predictor(MODEL_PARAMS)
+    # train model
+    model = RF_Predictor(**MODEL_PARAMS)
     model.fit(X, y)
     with open('../Web_App/data/predictor.pickle', 'wb') as f:
         pickle.dump(model, f)
-    print model.score(X, y)
-    print model.cross_val_score()
+
+    # evaluate model
+    print('training score: ', model.score(X, y))
+    print('cross validation score: ', model.cross_val_score())
     pred = model.predict(X)
-    plot_predicted_real(y, pred, 'RF model,100 trees, {:1.3f} oob_score'\
+    plot_predicted_real(y, pred, 'RF model,100 trees, {:1.3f} oob_score'
                         .format(model.cross_val_score()))
-
-
-
-
-
-
-
-
-
-
-
