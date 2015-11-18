@@ -1,5 +1,8 @@
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
+from scipy.stats import gaussian_kde
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 class Predictor(object):
 
@@ -23,6 +26,25 @@ class Predictor(object):
         preds = [tree.predict(X) for tree in trees]
         return np.array(preds)
 
+    def predict_median(self, X):
+        preds = self.predictions(X)
+        return np.median(preds, axis=0)
+
+    def predict_max_kde(self, X):
+        preds = self.predictions(X)
+        p = []
+        for row in preds.T:
+            fig = plt.figure()
+            graph = sns.kdeplot(row.ravel(), shade=True, color='g', alpha=1)
+            x,y = graph.get_lines()[0].get_data()
+            ind = np.argmax(y)
+            price = np.round(x[ind], decimals=-1)
+            p.append(price)
+            plt.close(fig)
+            graph = None
+        return p
+
+
     def score(self, X, y):
         return self.model.score(X, y)
 
@@ -31,5 +53,19 @@ class Predictor(object):
 
     def feature_importance(self):
         importances = self.model.feature_importances_
+        rank = np.argsort(importances)[::-1]
+        return importances, rank
+
+class RF_Predictor(RandomForestRegressor):
+    
+    def predictions(self, X):
+        preds = [tree.predict(X) for tree in self.estimators_]
+        return np.array(preds)
+
+    def cross_val_score(self):
+        return self.oob_score_
+
+    def feature_importance(self):
+        importances = self.feature_importances_
         rank = np.argsort(importances)[::-1]
         return importances, rank
