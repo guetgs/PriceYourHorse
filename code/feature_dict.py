@@ -1,31 +1,32 @@
 import numpy as np
 
-Sex_dict = {u'Broodmare': 'Broodmare', u'Colt': 'Colt/Filly',\
-            u'Filly': 'Colt/Filly', u'Foal': 'Foal/Yearling',\
-            u'Gelding': 'Adult', u'Mare': 'Adult', u'Ridgling': 'Ridgling',\
-            u'Stallion': 'Adult', u'Unborn Foal': 'Unborn Foal',\
-            u'Weanling': 'Foal/Yearling', u'Yearling': 'Foal/Yearling',\
+Sex_dict = {u'Broodmare': 'Broodmare', u'Colt': 'Colt/Filly',
+            u'Filly': 'Colt/Filly', u'Foal': 'Foal/Yearling',
+            u'Gelding': 'Adult', u'Mare': 'Adult', u'Ridgling': 'Ridgling',
+            u'Stallion': 'Adult', u'Unborn Foal': 'Unborn Foal',
+            u'Weanling': 'Foal/Yearling', u'Yearling': 'Foal/Yearling',
             u'Unknown': 'Foal/Yearling', u'-': None, np.nan: None}
 
 
-Color_dict = {u'Bay': 'Other', u'Bay Overo': 'Other', u'Bay Roan': 'Other',\
-              u'Black': 'Other', u'Black Overo': 'Other',\
-              u'Blue Grulla': 'Other', u'Blue Roan': 'Other',\
-              u'Brindle': 'Brindle', u'Brown': 'Other',\
-              u'Buckskin': 'Other', u'Buckskin Overo': 'Other',\
-              u'Champagne': 'Other', u'Chestnut': 'Other',\
-              u'Chestnut Overo': 'Other', u'Chocolate': 'Other',\
-              u'Cremello': 'Other', u'Dun': 'Other', \
-              u'Dun w/ Blk Points': 'Other', u'Dunalino': 'Other',\
-              u'Dunskin': 'Other', u'Grey': 'Grey', u'Grulla': 'Other',\
-              u'Liver Chestnut': 'Other', u'Other': 'Other',\
-              u'Overo': 'Other', u'Palomino': 'Other',\
-              u'Perlino': 'Other', u'Piebald': 'Piebald',\
-              u'Pinto': 'Other', u'Red Dun': 'Other', u'Red Roan': 'Other',\
-              u'Roan': 'Other', u'Sabino': 'Other', u'Smokey Black': 'Other',\
-              u'Sorrel': 'Other', u'Sorrel Overo': 'Other',\
-              u'Tobiano': 'Other', u'Tovero': 'Other', u'Unknown': 'Other',\
-              u'White': 'Other', u'sil': 'Other', u'-': 'Other', np.nan: 'Other'}
+Color_dict = {u'Bay': 'Other', u'Bay Overo': 'Other', u'Bay Roan': 'Other',
+              u'Black': 'Other', u'Black Overo': 'Other',
+              u'Blue Grulla': 'Other', u'Blue Roan': 'Other',
+              u'Brindle': 'Brindle', u'Brown': 'Other',
+              u'Buckskin': 'Other', u'Buckskin Overo': 'Other',
+              u'Champagne': 'Other', u'Chestnut': 'Other',
+              u'Chestnut Overo': 'Other', u'Chocolate': 'Other',
+              u'Cremello': 'Other', u'Dun': 'Other',
+              u'Dun w/ Blk Points': 'Other', u'Dunalino': 'Other',
+              u'Dunskin': 'Other', u'Grey': 'Grey', u'Grulla': 'Other',
+              u'Liver Chestnut': 'Other', u'Other': 'Other',
+              u'Overo': 'Other', u'Palomino': 'Other',
+              u'Perlino': 'Other', u'Piebald': 'Piebald',
+              u'Pinto': 'Other', u'Red Dun': 'Other', u'Red Roan': 'Other',
+              u'Roan': 'Other', u'Sabino': 'Other', u'Smokey Black': 'Other',
+              u'Sorrel': 'Other', u'Sorrel Overo': 'Other',
+              u'Tobiano': 'Other', u'Tovero': 'Other', u'Unknown': 'Other',
+              u'White': 'Other', u'sil': 'Other', u'-': 'Other',
+              np.nan: 'Other'}
 
 Breeds_dict = {u'Akhal Teke': 'Akhal Teke',
                u'American Cream': 'Other',
@@ -124,4 +125,4 @@ Breeds_dict = {u'Akhal Teke': 'Akhal Teke',
                u'Welsh Cob': 'Welsh Cob',
                u'Welsh Pony': 'Welsh Pony',
                u'Westphalian': 'Westphalian',
-               u'-': None, np.nan: None} 
+               u'-': None, np.nan: None}
