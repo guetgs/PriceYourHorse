@@ -67,8 +67,8 @@
 
 
 ### Due Friday, Nov 20
-- [ ] Polish LogBook
-- [ ] Implement 3min power point presentation of the project
+- [x] Polish LogBook
+- [x] Implement 3min power point presentation of the project
 
 
 ### Due Saturday, Nov 21
