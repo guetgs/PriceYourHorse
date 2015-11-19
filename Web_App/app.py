@@ -103,8 +103,8 @@ def prediction():
 
         X = np.hstack((df_X_tabular.values, X_text.todense()))
 
-        price = PREDICTOR.predict(X)[0]
-        price_string = '${}'.format(price)
+        price = np.round(PREDICTOR.predict(X)[0], decimals=-2)
+        price_string = '${}'.format(int(price))
         img = prepare_graph(PREDICTOR.predictions(X), price)
         data = img.getvalue().encode('base64')
         image_url = 'data:image/png;base64,{}'\
