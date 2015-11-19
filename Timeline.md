@@ -61,9 +61,9 @@
 
 ### Due Thursday, Nov 19
 - [x] Adjust user entry form of web application to the final feature selection
-- [ ] Update Readme of Github repo
-- [ ] Polish look of web application
-- [ ] Polish all functions and github repo
+- [x] Update Readme of Github repo
+- [x] Polish look of web application
+- [x] Polish all functions and github repo
 
 
 ### Due Friday, Nov 20
