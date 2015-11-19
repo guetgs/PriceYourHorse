@@ -1,193 +1,158 @@
 # Feature and Model Development Log-Book
-## Feature optimization
-### First Model
+This log book keeps track of the changes along the way of selecting and engineering features and models monitoring the effects of individual steps on the overall cross-validation R^2 score.
+## Feature Optimization
+### Version 0.0: The first running pipe.
 #####Features:
-- Skills / Disciplines Dummy Variables
-- Height (hh) as float (outlier removed, inches converted to hh
+- Skills / Disciplines as dummy variables
+- Height (hh) as float
+	- outliers removed
+	- inches are identified through their unrealisticly high values and converted to hh
 - Temperament as float
-- Weigth (lbs) as float (outlier removed)
-- Age as float (derived from Foal Date)
-- Breed as Dummy Variables (no selection)
-- Color as Dummy Variables (no selection)
-- Sex as Dummy Variables (no selection)
-- Pedigree is Dummy Variable
+	- Range 0 - 1 
+- Weigth (lbs) as float
+	- outliers removed
+- Age as float
+	- derived from Foal Date
+- Breed as dummy variables (no selection)
+- Color as dummy variables (no selection)
+- Sex as dummy variables (no selection)
+- Pedigree is dummy variable
+
+#####Fill Missing Values:
+- Use most common value
 
 #####Model:
 Sklearn's RandomForestRegressor
-
-Parameters:
 
 - n_estimators: 100
 - max_features: auto
 - oob_score: True
 
-#####Sample Data:
-R^2: 0.406
-OOB: -0.255
+#####Data:
+- Subsample of the data
+
+#####Scores:
+- R^2 of the training data: 0.406
+- OOB cross-validation R^2: -0.255
 ![Predicted vs Real Plot of Sample](figures/figure_1_PvsY_sample.png)
-#####All Data:
-R^2: 0.952
-OOB: 0.779
+
+### Version 0.1: Include all data.
+#####Change:
+- Use all data
+
+#####Scores:
+- R^2 of the training data: 0.952
+- OOB cross-validation R^2: 0.779
 ![Predicted vs Real Plot of all Data](figures/figure_2_PvsY_all.png)
 
-### Second Model
-Remove Price Outliers (> 3*Std)
-#####All Data:
-R^2: 0.882
-OOB: 0.288
+### Version 0.2: Remove target outliers.
+#####Change:
+- Remove price outliers (> 3*Std)
+
+#####Scores:
+- R^2 of the training data: 0.882
+- OOB cross-validation R^2: 0.288
+
 ![Predicted vs Real Plot of all Data without outliers](figures/figure_3_PvsY_all_without_outlier.png)
 
-### Tabular Feature Engineering
-Breeds: Keep all except categories with single values.
+## EDA of Tabular Features
+###Breeds:
 ![Boxplot prices vs. breeds](figures/figure_6_boxplot_price_breed_zoomin.png)
-
-Colors: Classify in Brindle, Grey, Piebald, Other
+#####Conclusion:
+Keep all except categories with single values.
+###Colors: 
 ![Boxplot prices vs. colors](figures/figure_8_boxplot_price_color_zoominmore.png)
-
-Sexes: Classify into Broodmare, Unborn Foal, Ridgling, Adult, Colt/Filly, Foal/Yearling
+#####Conclusion:
+Classify in Brindle, Grey, Piebald, Other
+###Sexes:
 ![Boxplot prices vs. sexes](figures/figure_9_boxplot_price_sex_zoominmore.png)
-
-Temperament: Classify into Extreme vs Intermediate Temperament
-![Boxplot prices vs. temperament](figure_9_boxplot_price_temperament_zoomin.png)
-
-Weight: Discard Weight
+#####Conclusion:
+Classify into Broodmare, Unborn Foal, Ridgling, Adult, Colt/Filly, Foal/Yearling
+###Temperament:
+![Boxplot prices vs. temperament](figures/figure_9_boxplot_price_temperament_zoomin.png)
+#####Conclusion:
+Classify into Extreme vs Intermediate Temperament
+###Weight:
 ![Boxplot prices vs. weight](figures/figure_10_boxplot_price_weight_zoomin.png)
+#####Conclusion:
+Discard Weight
 
 
+### Version 1.0: Reduce feature space
+#####Change:
+- Reduced variable space for Skills/Disciplines, Breed, Color, Sex
+	- Map categories to subset of or new categories for Bred, Color, Sex
+	- Discard categories with lower feature importance for Skills/Disciplines
+- Extreme vs intermediate values for Temperament
+- Remove weight
+- Use only data with prices < $60,000
 
-### Third Model
-#####Features:
-- Skills / Disciplines Dummy Variables (limited Skill set)
-- Height (hh) as float (outlier removed, inches converted to hh)
-- Temperament as dummy (extreme vs intermediate values)
-- Age as float (derived from Foal Date)
-- Breed as Dummy Variables (remove selected breeds)
-- Color as Dummy Variables (reduced variable space)
-- Sex as Dummy Variables (reduced variable space)
-- Pedigree is Dummy Variable
+#####Scores:
+- R^2 of the training data: 0.887
+- OOB cross-validation R^2: 0.332
 
-#####Model:
-Sklearn's RandomForestRegressor
-
-Parameters:
-- n_estimators: 100
-- max_features: auto
-- oob_score: True
-
-#####All Data (prices < 60000):
-R^2: 0.887
-OOB: 0.332
 ![Predicted vs Real Plot of all Data without outliers, first feature engineering step](figures/figure_14_PvsV_allwo_outlier_engineeredtabularfeatures.png)
 
-### Fourth Model
-#####Features:
-- Skills / Disciplines merged with Descriptions, term-frequency matrix (strip_accents='unicode', stop_words='english', ngram_range=(1,2), min_df=100, use_idf=False)
-- Height (hh) as float (outlier removed, inches converted to hh)
-- Temperament as dummy (extreme vs intermediate values)
-- Age as float (derived from Foal Date)
-- Breed as Dummy Variables (remove selected breeds)
-- Color as Dummy Variables (reduced variable space)
-- Sex as Dummy Variables (reduced variable space)
-- Pedigree is Dummy Variable
+### Version 2.0: Add text data
+#####Change:
+- Skills/Disciplines merged with Descriptions
+	- Vectorize into term-frequency matrix (TfidfVectorizer)
+	- Parameters: strip_accents='unicode', stop_words='english', ngram_range=(1,2), min_df=100, use_idf=False 
 
-#####Model:
-Sklearn's RandomForestRegressor
+#####Scores:
+- R^2 of the training data: 0.918
+- OOB cross-validation R^2: 0.413
 
-Parameters:
-- n_estimators: 100
-- max_features: auto
-- oob_score: True
-
-#####All Data (prices < 60000):
-R^2: 0.918
-OOB: 0.413
 ![Predicted vs Real Plot of all Data without outliers, term-frequency matrix for descriptions](figures/figure_15_PvsY_withdescription.png)
 
-### Model 4a
-Use inverse document frequency
-#####Features:
-- Skills / Disciplines merged with Descriptions, term-frequency matrix (strip_accents='unicode', stop_words='english', ngram_range=(1,2), min_df=100, use_idf=True)
-- Height (hh) as float (outlier removed, inches converted to hh)
-- Temperament as dummy (extreme vs intermediate values)
-- Age as float (derived from Foal Date)
-- Breed as Dummy Variables (remove selected breeds)
-- Color as Dummy Variables (reduced variable space)
-- Sex as Dummy Variables (reduced variable space)
-- Pedigree is Dummy Variable
+### Version 2.1: Use inverse document frequency
+#####Change:
+- Use inverse document frequency
+	- TfidfVectorizer Parameter: use_idf=True
 
-#####Model:
-Sklearn's RandomForestRegressor
+#####Scores:
+- R^2 of the training data: 0.920
+- OOB cross-validation R^2: 0.422
 
-Parameters:
-- n_estimators: 100
-- max_features: auto
-- oob_score: True
-
-#####All Data (prices < 60000):
-R^2: 0.920
-OOB: 0.422
 ![Predicted vs Real Plot of all Data without outliers, tf-idf matrix for descriptions](figures/figure_18_PvsY_with_tf_idf_description.png)
 
-### Model 4b
-Model 4a using own tokenizer (nltk word_tokenizer, WordNetLemmatizer)
+### Version 3.0: Use topics from NMF
+#####Change:
+- Use TfidfVectorizer
+	- Parameters: use_idf=False
+	- Use internal tokenizer
+- Extract 12 topics using NMF
+	- Topic as single numeric column (topic id) 
 
+#####Scores:
+- R^2 of the training data: 0.705
+- OOB cross-validation R^2: 0.224
 
-#####All Data (prices < 60000):
-R^2: 0.916
-OOB: 0.400
-![Predicted vs Real Plot of all Data without outliers, tf-idf matrix for lemmatized descriptions](figures/figure_19_PvsY_lemmatized.png)
-
-### Fifth Model
-#####Features:
-- Skills / Disciplines merged with Descriptions, term-frequency matrix (strip_accents='unicode', stop_words='english', ngram_range=(1,2), min_df=100, use_idf=False), topic extraction using NMF (12 topics), topic as single numeric column
-- Height (hh) as float (outlier removed, inches converted to hh)
-- Temperament as dummy (extreme vs intermediate values)
-- Age as float (derived from Foal Date)
-- Breed as Dummy Variables (remove selected breeds)
-- Color as Dummy Variables (reduced variable space)
-- Sex as Dummy Variables (reduced variable space)
-- Pedigree is Dummy Variable
-
-#####Model:
-Sklearn's RandomForestRegressor
-
-Parameters:
-- n_estimators: 100
-- max_features: auto
-- oob_score: True
-
-#####Trained only on data with price (prices < 60000):
-R^2: 0.705
-OOB: 0.224
 ![Predicted vs Real Plot of all priced Data without outliers, topic column](figures/figure_16_PvsY_topics_from_description.png)
 
-### Sixth Model
-#####Features:
-- Skills / Disciplines merged with Descriptions, term-frequency matrix (strip_accents='unicode', stop_words='english', ngram_range=(1,2), min_df=100, use_idf=False), topic extraction using NMF (12 topics), topic dummy variables
-- Height (hh) as float (outlier removed, inches converted to hh)
-- Temperament as dummy (extreme vs intermediate values)
-- Age as float (derived from Foal Date)
-- Breed as Dummy Variables (remove selected breeds)
-- Color as Dummy Variables (reduced variable space)
-- Sex as Dummy Variables (reduced variable space)
-- Pedigree is Dummy Variable
+### Version 3.1: Topic dummy variables
+#####Change:
+- Use dummy variables for topics
 
-#####Model:
-Sklearn's RandomForestRegressor
+#####Scores:
+- R^2 of the training data: 0.706
+- OOB cross-validation R^2: 0.230
 
-Parameters:
-- n_estimators: 100
-- max_features: auto
-- oob_score: True
-
-#####Trained only on data with price (prices < 60000):
-R^2: 0.706
-OOB: 0.230
 ![Predicted vs Real Plot of all priced Data without outliers, topic dummies](figures/figure_17_PvsY_topics_as_dummies.png)
 
-### Seventh Model
-#####Features:
-- Skills / Disciplines merged with Descriptions, term-frequency matrix 
+### Version 4.0: Use custom tokenizer
+#####Change:
+- Start from version 2.1
+- Use nltk word_tokenizer and WordNetLemmatizer
+
+#####Scores:
+- R^2 of the training data: 0.916
+- OOB cross-validation R^2: 0.400
+
+![Predicted vs Real Plot of all Data without outliers, tf-idf matrix for lemmatized descriptions](figures/figure_19_PvsY_lemmatized.png)
+
+### Version 4.1: Use selected vocabulary
+#####Change:
 - TFidfVectorizer: strip_accents='unicode',\
                           stop_words='english',\
                           ngram_range=(1, 1),\
@@ -196,89 +161,54 @@ OOB: 0.230
                           vocabulary=Vocab,\
                           use_idf=True
 
-- Height (hh) as float (outlier removed, inches converted to hh)
-- Temperament as dummy (extreme vs intermediate values)
-- Age as float (derived from Foal Date)
-- Breed as Dummy Variables (remove selected breeds)
-- Color as Dummy Variables (reduced variable space)
-- Sex as Dummy Variables (reduced variable space)
-- Pedigree is Dummy Variable
+#####Scores:
+- R^2 of the training data: 0.917
+- OOB cross-validation R^2: 0.398
 
-#####Model:
-Sklearn's RandomForestRegressor
-
-Parameters:
-- n_estimators: 100
-- max_features: auto
-- oob_score: True
-
-#####Trained only on data with price (prices < 60000):
-R^2: 0.917
-OOB: 0.398
 ![Predicted vs Real Plot all priced Data without outliers, vocab](figures/figure_20_PvsY_lemmatized_vocab_only.png)
 
 
 ## Change in code: separate processor/vectorizer
-###Run I:
-#####Data:
-Only horses with price
-#####Features:
-- Skills / Disciplines merged with Descriptions, term-frequency matrix, use vocab
-- TFidfVectorizer: strip_accents='unicode',\
-                          stop_words='english',\
-                          ngram_range=(1, 1),\
-                          min_df=100,\
-                          tokenizer=tokenizer,\
-                          vocabulary=Vocab,\
-                          use_idf=True
-- tokenizer: WordNetLemmatizer()
-- Height (hh) as float (outlier removed, inches converted to hh)
+###Version 5.0:
+#####Change:
 - Temperament as float
-- Age as float (derived from Foal Date)
-- Breed as Dummy Variables (according to dict)
-- Color as Dummy Variables (reduced variable space)
-- Sex as Dummy Variables (reduced variable space)
-- Pedigree is Dummy Variable
 - Fillna method: mode for categorical, mean for numeric
-- PRICE_RANGE = [0, 60000]
 
-#####Model:
-Sklearn's RandomForestRegressor
+#####Scores:
+- R^2 of the training data: 0.915
+- OOB cross-validation R^2: 0.393
 
-Parameters:
-- n_estimators: 100
-- max_features: auto
-- oob_score: True
-
-#####Trained only on data with price (prices < 60000):
-R^2: 0.915
-OOB: 0.393
 ![Predicted vs Real Plot separate vectorizer](figures/figure_21_PvsY_separate_preprocessing_vectorizing.png)
 
-###Run II:
-same as bevore, but
-PRICE_RANGE = [150, 60000]
-R^2: 0.918
-OOB: 0.400
+###Version 5.1:
+#####Change:
+- Samples only from prices in [150, 60000]
+
+#####Scores:
+- R^2 of the training data: 0.918
+- OOB cross-validation R^2: 0.400
+
 ![Predicted vs Real Plot separate vectorizer](figures/figure_21_PvsY_more_than_150_separate_preprocessing_vectorizing.png)
 
-###Run III:
-same as bevore, but
-
-MODEL_PARAMS = {'n_estimators': 100,
+###Version 5.2:
+#####Change:
+- Change max_features in model to 'sqrt'
+- MODEL_PARAMS = {'n_estimators': 100,
                 'max_features': 'sqrt',
                 'oob_score': True,
                 'n_jobs': -1}
+                
+#####Scores:
+- R^2 of the training data: 0.921
+- OOB cross-validation R^2: 0.417
 
-R^2: 0.921
-OOB: 0.417
 ![Predicted vs Real Plot separate vectorizer](figures/figure_22_PvsY_more_than_150_separate_preprocessing_vectorizing_sqrt_max_features.png)
 
 ## Model optimization
 ### Current Random Forest Predictor against Default Models
-Use 5-fold cross-validation
-Default parameters for all models
-Predictor Parameter: MODEL_PARAMS = {'n_estimators': 100,
+- Use 5-fold cross-validation
+- Default parameters for all models
+- Current Predictor parameters: {'n_estimators': 100,
                 'max_features': 'sqrt',
                 'oob_score': True,
                 'n_jobs': -1}
@@ -286,118 +216,44 @@ Predictor Parameter: MODEL_PARAMS = {'n_estimators': 100,
 ![Model Comparison](figures/Model_Comp_1.png)
 
 ### Explore parameter space of other models
-MODEL_PARAMS = {'n_estimators': 100,
-                'max_features': 'sqrt',
-                'oob_score': True,
-                'n_jobs': -1}
-
-RF_PARAMS = {'n_estimators': 100,
-             'max_features': 5,
-             'oob_score': True,
-             'n_jobs': -1}
-
-GB_PARAMS = {'loss': 'lad',
-             'learning_rate': 0.1,
-             'n_estimators': 100,
-             'max_depth': 3,
-             'max_features': 'sqrt',
+- Random Forest: {'n\_estimators': 100,
+             'max\_features': 5,
+             'oob\_score': True,
+             'n\_jobs': -1}
+- Gradient Boosting: {'loss': 'lad',
+             'learning\_rate': 0.1,
+             'n\_estimators': 100,
+             'max\_depth': 3,
+             'max\_features': 'sqrt',
              'alpha': 0.9}
-
-SVR_PARAMS = {'kernel': 'rbf',
+- Support Vector Regressor: {'kernel': 'rbf',
               'C': 0.1,
               'epsilon': 0.1}
 
 ![Model Comparison](figures/Model_Comp_2.png)
 
-MODEL_PARAMS = {'n_estimators': 100,
-                'max_features': 'sqrt',
-                'oob_score': True,
-                'n_jobs': -1}
-
-RF_PARAMS = {'n_estimators': 100,
-             'max_features': 20,
-             'oob_score': True,
-             'n_jobs': -1}
-
-GB_PARAMS = {'loss': 'huber',
-             'learning_rate': 0.1,
-             'n_estimators': 100,
-             'max_depth': 3,
-             'max_features': 'sqrt',
-             'alpha': 0.9}
-
-SVR_PARAMS = {'kernel': 'rbf',
-              'C': 0.5,
-              'epsilon': 0.2}
+#####Changes:
+- Random Forest: 'max\_features: 20
+- Gradient Boosting: 'loss': 'huber'
+- Support Vector Regressor: 'C': 0.5, 'epsilon': 0.2
 
 ![Model Comparison](figures/Model_Comp_3.png)
 
-MODEL_PARAMS = {'n_estimators': 100,
-                'max_features': 'sqrt',
-                'oob_score': True,
-                'n_jobs': -1}
-
-RF_PARAMS = {'n_estimators': 200,
-             'max_features': 20,
-             'oob_score': True,
-             'n_jobs': -1}
-
-GB_PARAMS = {'loss': 'huber',
-             'learning_rate': 0.05,
-             'n_estimators': 200,
-             'max_depth': 3,
-             'max_features': 'sqrt',
-             'alpha': 0.9}
-
-SVR_PARAMS = {'kernel': 'poly',
-              'C': 0.5,
-              'epsilon': 0.2}
+#####Changes:
+- Random Forest: 'n\_estimators': 200
+- Gradient Boosting: 'learning\_rate': 0.05, 'n\_estimators': 200
+- Support Vector Regressor: 'kernel': 'poly'
 
 ![Model Comparison](figures/Model_Comp_4.png)
 
-MODEL_PARAMS = {'n_estimators': 100,
-                'max_features': 'sqrt',
-                'oob_score': True,
-                'n_jobs': -1}
-
-RF_PARAMS = {'n_estimators': 200,
-             'max_features': 20,
-             'oob_score': True,
-             'n_jobs': -1}
-
-GB_PARAMS = {'loss': 'ls',
-             'learning_rate': 0.05,
-             'n_estimators': 200,
-             'max_depth': 3,
-             'max_features': 'sqrt',
-             'alpha': 0.9}
-
-SVR_PARAMS = {'kernel': 'poly',
-              'C': 0.5,
-              'epsilon': 0.2}
+#####Changes:
+- Gradient Boosting: 'loss': 'ls', 
 
 ![Model Comparison](figures/Model_Comp_5.png)
 
-MODEL_PARAMS = {'n_estimators': 400,
-                'max_features': 'sqrt',
-                'oob_score': True,
-                'n_jobs': -1}
+#####Changes:
+- Current Predictor: 'n\_estimators': 400
 
-RF_PARAMS = {'n_estimators': 200,
-             'max_features': 20,
-             'oob_score': True,
-             'n_jobs': -1}
-
-GB_PARAMS = {'loss': 'ls',
-             'learning_rate': 0.05,
-             'n_estimators': 200,
-             'max_depth': 3,
-             'max_features': 'sqrt',
-             'alpha': 0.9}
-
-SVR_PARAMS = {'kernel': 'poly',
-              'C': 0.5,
-              'epsilon': 0.2}
 ![Model Comparison](figures/Model_Comp_8_more_estimators.png)
 
 
@@ -421,6 +277,6 @@ SVR_PARAMS = {'kernel': 'poly',
     def predict(self, X):
         preds = self.predictions(X)
         return np.median(preds, axis=0)
-![Model Comparison](Model_Comp_7_median_prediction.png)
+![Model Comparison](figures/Model_Comp_7_median_prediction.png)
 
 
