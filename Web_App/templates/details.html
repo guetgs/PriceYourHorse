@@ -6,6 +6,13 @@
       </div>
 <div class="inner cover">
   <h2>Details</h2>
-  <p>Under the hood, PriceYourHorse relys on a regression model based on thousands of ads scraped from <a class="inline" href='http://www.equinenow.com/horses.htm'>www.equinenow.com</a>. Features from tabular, mostly categorical information as well as from the text description are selected based on feature importance and used to fit the final regression model. Missing values in the dataset are derived from the ensembled data set. The final trained model as well as the trained preprocessor required to transform user entries into a feature matrix processable by the model are saved for rapid availability in a web-application. The PriceYourHorse web-application allows the user to select values for all important features previously identified and predicts a price based on the underlying trained model, which is subsequently presented to the user together with his or her feature value selection.</p>
+  <p style="text-align:center;"><a href="https://github.com/guetgs/PriceYourHorse">https://github.com/guetgs/PriceYourHorse</a></p>
+  <img src="../static/figures/under_the_hood.png" alt="Project Scheme" style="display:block;margin-left:auto;margin-right:auto;margin-bottom:20px;width:70%">
+  <h3>Features</h3>
+  <p>Under the hood, PriceYourHorse relys on a regression model based on thousands of ads scraped from <a class="inline" href='http://www.equinenow.com/horses.htm'>www.equinenow.com</a>. Under the hood, PriceYourHorse relys on a regression model based on thousands of ads scraped from www.equinenow.com. The continuous features hight, temperament and age serve as untransformed features. The categorical variables breed, color and sex are mapped to cumulative categories, thereby reducing the feature space, and serve as dummy variables. The list of skills and disciplines is merged with the text description and vectorized using a tf-idf vectorizer. Based on feature importance analysis, a vocabulary of keywords represent the text features. In the web application, the user selects these keywords directly instead of entering a text description.</p>
+  <h3>Model and Prediction</h3>
+  <p>Using the selected features, a processor transforming categorical variables, a vectorizer transforming text data and a random forest regressor model are fit. These fitted elements transform and process the user selection in the web application. The displayed price corresponds to the ensemble prediction of the model. In addition, a graph visually presents the prediciton distribution of all individual decision trees fit by kernel density estimation.</p>
+  <h3>Performance</h3>
+  <p>The final model reaches a cross validation R^2 score of 0.4. This indicates that the model explains 40% of the variability in prices. However, there is a large fraction of remaining variability unexplained by the features of the horse that impairs the precision of the prediction.</p>
 </div>
 {% endblock %}
