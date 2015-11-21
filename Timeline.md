@@ -72,5 +72,5 @@
 
 
 ### Due Saturday, Nov 21
-- [ ] Update the details page of the web-application
-- [ ] Final polish on web application and powerpoint presentation
+- [x] Update the details page of the web-application
+- [x] Final polish on web application and powerpoint presentation
