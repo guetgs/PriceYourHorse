@@ -15,9 +15,16 @@ from tokenizer import tokenizer
 
 app = flask.Flask(__name__)
 
-global PREPROCESSOR
+global PROCESSOR
 global PREDICTOR
 global VECTORIZER
+with open('data/vectorizer.pickle', 'rb') as f:
+    VECTORIZER = pickle.load(f)
+with open('data/processor.pickle', 'rb') as f:
+    PROCESSOR = pickle.load(f)
+with open('data/predictor.pickle', 'rb') as f:
+    PREDICTOR = pickle.load(f)
+print('loaded...')
 
 
 @app.route('/')
@@ -151,7 +158,7 @@ def prepare_graph(preds, price):
     plt.title('Predictions of Individual Estimators',
               fontsize=20, weight='bold')
     plt.xlabel('Price [$]', fontsize=18)
-    plt.ylabel('Kernel density estimate', fontsize=18)
+    plt.ylabel('Kernel Density Estimate', fontsize=18)
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
     plt.tight_layout()
@@ -193,14 +200,4 @@ def prepare_dataframe(form):
 
 
 if __name__ == '__main__':
-    global PROCESSOR
-    global PREDICTOR
-    global VECTORIZER
-    with open('data/vectorizer.pickle', 'rb') as f:
-        VECTORIZER = pickle.load(f)
-    with open('data/processor.pickle', 'rb') as f:
-        PROCESSOR = pickle.load(f)
-    with open('data/predictor.pickle', 'rb') as f:
-        PREDICTOR = pickle.load(f)
-    print('loaded...')
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=False)
