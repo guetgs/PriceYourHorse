@@ -12,9 +12,15 @@
   color: #395F00;
 }
 
-h2, h3, .page-header, .footer {
+h2, h3, .footer {
   text-align: center;
   margin-top: 20px;
+}
+
+.page-header {
+  text-align: center;
+  padding-top: 20px;
+  margin-top: 0px
 }
 
 .inline {
@@ -34,6 +40,18 @@ body {
   color: #fff;
   text-align: justify;
   text-shadow: 0 1px 3px rgba(0,0,0,.5);
+}
+
+.header-img {
+  float: right;
+  margin-left: 10px;
+  height: 148px;
+}
+
+@media (min-width:560px) {
+  .header-img {
+    margin-left: -123px;
+  }
 }
 
 @media (min-width:1200px) {
